@@ -8,7 +8,7 @@ function Cadastramento() {
   return (
     <div>
       <Pesquisa/>
-
+      
 <br />
 <br />
       <main>

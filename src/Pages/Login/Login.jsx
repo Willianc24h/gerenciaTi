@@ -23,16 +23,17 @@ function Login() {
     e.preventDefault(); // Previne o comportamento padrão do formulário
 
     try {
-      const response = await axios.post("https://localhost:7194/api/Login", {
+      const response = await axios.post("https://localhost:7001/api/Login", {
         email,
         password,
       });
 
       // Armazena o token no localStorage
       localStorage.setItem("token", response.data.token);
+      console.log(response.data.token);
       window.location.href = "/gerenciamento"; // Redireciona para a página de gerenciamento
     } catch (err) {
-      setError("Credenciais inválidas");
+      setError("E-mail e/ou senha incorreta");
       console.error(err);
     }
   };
