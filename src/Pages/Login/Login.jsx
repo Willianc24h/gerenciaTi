@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import image from '../../assets/logoc24h.jpg'
 import S from "./Login.module.css";
-import img from "../../assets/Login-amico.svg";
 import axios from "axios";
 
 function Login() {
@@ -49,12 +49,11 @@ function Login() {
   const handleMouseUpPassword = (event) => {
     event.preventDefault();
   };
-
+ 
   return (
     <div className={S.tudo}>
-      <h2 className={S.login}>Login</h2>
-      <form onSubmit={handleSubmit} className={S.flexContainer}>
-        <img src={img} alt="Login illustration" className={S.img} />
+    <img src={image} alt="" className={S.image}/>
+<form onSubmit={handleSubmit} className={S.flexContainer}>
         <div className={S.input}>
           {error && <p style={{ color: "red" }}>{error}</p>}
           <TextField
@@ -65,11 +64,11 @@ function Login() {
             onChange={(e) => setEmail(e.target.value)}
             required
             sx={{
-              "& .MuiInputLabel-root": { color: "#190019" },
-              "& .MuiInputLabel-root.Mui-focused": { color: "purple" },
+              "& .MuiInputLabel-root": { color: "#6184a4" },
+              "& .MuiInputLabel-root.Mui-focused": { color: "#647cb4" },
               "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#190019" },
-                "&.Mui-focused fieldset": { borderColor: "purple" },
+                "& fieldset": { borderColor: "#6184a4" },
+                "&.Mui-focused fieldset": { borderColor: "#647cb4" },
               },
               margin: "1em",
               width: "100%",
@@ -77,11 +76,11 @@ function Login() {
           />
           <FormControl
             sx={{
-              "& .MuiInputLabel-root": { color: "#190019" },
-              "& .MuiInputLabel-root.Mui-focused": { color: "purple" },
+              "& .MuiInputLabel-root": { color: "#6184a4" },
+              "& .MuiInputLabel-root.Mui-focused": { color: "#647cb4" },
               "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#190019" },
-                "&.Mui-focused fieldset": { borderColor: "purple" },
+                "& fieldset": { borderColor: "#6184a4" },
+                "&.Mui-focused fieldset": { borderColor: "#647cb4" },
               },
               margin: "1em",
               width: "100%",
@@ -118,15 +117,17 @@ function Login() {
             variant="contained"
             type="submit"
             sx={{
-              backgroundColor: "purple",
+              backgroundColor: "#f8b005",
               color: "white",
-              "&:hover": { backgroundColor: "darkviolet" },
+              "&:hover": { backgroundColor: "#f6e297" },
             }}
           >
-            Login
+            Entrar
           </Button>
         </div>
       </form>
+
+      
     </div>
   );
 }

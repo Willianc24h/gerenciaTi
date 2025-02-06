@@ -1,13 +1,22 @@
-.img{
-    width: 30em;
-    height: 30em;
+.image{
+    height:9.125em ;
+    width: 10.5em;
+    margin:0 auto;
+    margin-top:3em ;
 }
+
 
 .flexContainer{
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
-
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 10px;
+    width: 30em;
+    -webkit-box-shadow: 3px 6px 22px -3px rgba(224,224,224,1);
+-moz-box-shadow: 3px 6px 22px -3px rgba(224,224,224,1);
+box-shadow: 3px 6px 22px -3px rgba(224,224,224,1);
 }
 
 .input{
@@ -15,20 +24,13 @@
     flex-direction: column;
     align-items: center;
     padding: 1em;
+    margin: 1em;
+    justify-content: center;
 }
 
-.tudo{
-    height: 100%;
+.tudo {
+    height: 78.8vh;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    
-}
-
-.login{
-    font-family: Oswald;
-    color: #522b5b;
-    text-align: center;
-    font-size: 2rem;
-    margin: 0.5em;
+    justify-content: space-evenly;
 }

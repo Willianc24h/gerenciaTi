@@ -7,7 +7,8 @@ function ModalInformacoes({ open, onClose, item }) {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "30em",
+    width: "20em",
+    fontFamily: " monospace",
     bgcolor: "background.paper",
     border: "2px solid #190019",
     boxShadow: 24,
@@ -31,10 +32,10 @@ function ModalInformacoes({ open, onClose, item }) {
             <Button onClick={onClose}
             sx={{
                 height: "3em",
-                backgroundColor: "#522b5b",
+                backgroundColor: "#eab71b",
                 color: "#ffffff",
                 marginTop:"1em",
-                "&:hover": { backgroundColor: "#3f0047s" },
+                "&:hover": { backgroundColor: "#f6e297" },
               }}
             >Fechar</Button>
           </>
