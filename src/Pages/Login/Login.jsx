@@ -31,7 +31,7 @@ function Login() {
       // Armazena o token no localStorage
       localStorage.setItem("token", response.data.token);
       console.log(response.data.token);
-      window.location.href = "/gerenciamento"; // Redireciona para a página de gerenciamento
+      window.location.href = "/computadores"; // Redireciona para a página de gerenciamento
     } catch (err) {
       setError("E-mail e/ou senha incorreta");
       console.error(err);
@@ -62,7 +62,6 @@ function Login() {
             variant="outlined"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
             sx={{
               "& .MuiInputLabel-root": { color: "#6184a4" },
               "& .MuiInputLabel-root.Mui-focused": { color: "#647cb4" },

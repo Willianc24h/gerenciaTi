@@ -3,6 +3,7 @@ import Header from './Components/Header/Header'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './Pages/Login/Login'
 import Cadastramento from './Pages/Cadastramento/Cadastramento'
+import Perifericos from '../src/Pages/Perifericos/Perifericos'
 
 function App() {
   return (
@@ -12,7 +13,8 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/gerenciamento" element={<Cadastramento />} />
+            <Route path="/computadores" element={<Cadastramento />} />
+            <Route path="/perifericos" element={<Perifericos />} />
           </Routes>
         </BrowserRouter>
       </main>

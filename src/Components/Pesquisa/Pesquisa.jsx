@@ -54,26 +54,32 @@ function PesquisaComLupa() {
       alert(`Digite um ${tipoPesquisa.toLowerCase()} para pesquisar!`);
       return;
     }
-    
+
     const pesquisaNormalizada = pesquisa.trim().toLowerCase();
     let resultados = [];
 
     if (tipoPesquisa === "Setor") {
-      resultados = response.filter(item => item.setor?.trim().toLowerCase().includes(pesquisaNormalizada));
+      resultados = response.filter((item) =>
+        item.setor?.trim().toLowerCase().includes(pesquisaNormalizada)
+      );
     } else if (tipoPesquisa === "Tag") {
-      const resultado = response.find(item => item.tag?.trim().toLowerCase() === pesquisaNormalizada);
+      const resultado = response.find(
+        (item) => item.tag?.trim().toLowerCase() === pesquisaNormalizada
+      );
       if (resultado) {
         setSelectedItem(resultado);
         setOpenInfo(true);
         return;
       }
     } else if (tipoPesquisa === "Usuario") {
-      resultados = response.filter(item => item.usuario?.trim().toLowerCase().includes(pesquisaNormalizada));
+      resultados = response.filter((item) =>
+        item.usuario?.trim().toLowerCase().includes(pesquisaNormalizada)
+      );
     }
 
     setFilteredProducts(resultados);
     setSearchPerformed(true);
-    if (resultados.length === 0) alert(`Nenhum ${tipoPesquisa.toLowerCase()} encontrado!`);
+    
   };
 
   const handleClearSearch = () => {
@@ -85,28 +91,41 @@ function PesquisaComLupa() {
   return (
     <main className={S.pesquisa}>
       <div className={S.label}>
-        <FormControl sx={{ minWidth: 180, marginRight: 2 }}>
-          <InputLabel>Filtro</InputLabel>
-          <Select value={tipoPesquisa} onChange={(e) => setTipoPesquisa(e.target.value)}>
-            <MenuItem value="Usuario">Usuário</MenuItem>
+        <FormControl sx={{ marginRight: 4, minWidth: 180 }}>
+          <InputLabel id="demo-simple-select-helper-label">Buscar por</InputLabel>
+          <Select
+            labelId="demo-simple-select-helper-label"
+            onChange={(e) => setTipoPesquisa(e.target.value)}
+            id="demo-simple-select-helper"
+            value={tipoPesquisa}
+            label="Buscar por"
+          >
+            <MenuItem value="">
+              <em>Selecione</em>
+            </MenuItem>
             <MenuItem value="Setor">Setor</MenuItem>
             <MenuItem value="Tag">Tag</MenuItem>
+            <MenuItem value="Usuario">Usuário</MenuItem>
           </Select>
         </FormControl>
-
         <TextField
           label="Pesquisar"
           variant="outlined"
           fullWidth
-          required
           value={pesquisa}
           onChange={(e) => setPesquisa(e.target.value)}
           sx={{ width: "40em" }}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                {pesquisa && <IconButton onClick={handleClearSearch}><CloseIcon /></IconButton>}
-                <IconButton onClick={handleSearchClick}><SearchIcon /></IconButton>
+                {pesquisa && (
+                  <IconButton onClick={handleClearSearch}>
+                    <CloseIcon />
+                  </IconButton>
+                )}
+                <IconButton onClick={handleSearchClick}>
+                  <SearchIcon />
+                </IconButton>
               </InputAdornment>
             ),
           }}
@@ -117,7 +136,13 @@ function PesquisaComLupa() {
             variant="outlined"
             startIcon={<CreateNewFolderIcon />}
             onClick={() => setOpenCadastro(true)}
-            sx={{ height: "4em", background: 'linear-gradient(to bottom, #eab71b,rgb(234, 137, 27))', color: "#ffffff", border:"solid 1px #fff" }}
+            sx={{
+              height: "4em",
+              background:
+                "linear-gradient(to bottom, #eab71b,rgb(234, 137, 27))",
+              color: "#ffffff",
+              border: "solid 1px #fff",
+            }}
           >
             Adicionar Equipamento
           </Button>
@@ -125,37 +150,57 @@ function PesquisaComLupa() {
       </div>
 
       <div className={S.resultados}>
-        {searchPerformed && filteredProducts.length > 0 && (
-          <Box>
-            <Typography variant="h6" sx={{ marginBottom: 2 }}>
-              Resultados encontrados:
-            </Typography>
-            <Grid container spacing={2}>
-              {filteredProducts.map((item, index) => (
-                <Grid item xs={12} sm={6} md={3} lg={3} key={index}>
-                  <Card sx={{ width: 300, height: 200, backgroundColor: "#203e77", color: "#ffffff" }}>
-                    <CardContent>
-                      <Typography variant="h6">{`Usuário: ${item.usuario}`}</Typography>
-                      <Typography>{`Setor: ${item.setor}`}</Typography>
-                      <Typography>{`Tag: ${item.tag}`}</Typography>
-                      <Typography>{`Tipo: ${item.tipo}`}</Typography>
-                      <Typography>{`Data de Entrada: ${item.dataDeEntrada}`}</Typography>
-                      <Typography>{`Ativo: ${item.ativo ? "Sim" : "Não"}`}</Typography>
-                      {item.dataDeSaida && <Typography>{`Data de Saída: ${item.dataDeSaida}`}</Typography>}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        )}
-        {searchPerformed && filteredProducts.length === 0 && (
-          <Typography variant="body1" color="error">Nenhum resultado encontrado.</Typography>
-        )}
-      </div>
+  {searchPerformed && filteredProducts.length > 0 && (
+    <Box>
+      <Typography variant="h6" sx={{ marginBottom: 2 }}>
+        Resultados encontrados:
+      </Typography>
+      <Grid container spacing={2} justifyContent="space-around" alignItems="center">
+        {filteredProducts.map((item, index) => (
+          <Grid item xs={12} sm={6} md={3} lg={3} key={index}>
+            <Card
+              sx={{
+                width: 300,
+                height: 200,
+                backgroundColor: "#203e77",
+                color: "#ffffff",
+              }}
+            >
+              <CardContent>
+                <Typography variant="h6">{`Usuário: ${item.usuario}`}</Typography>
+                <Typography>{`Setor: ${item.setor}`}</Typography>
+                <Typography>{`Tag: ${item.tag}`}</Typography>
+                <Typography>{`Tipo: ${item.tipo}`}</Typography>
+                <Typography>{`Data de Entrada: ${item.dataDeEntrada}`}</Typography>
+                <Typography>{`Ativo: ${item.ativo ? "Sim" : "Não"}`}</Typography>
+                {item.dataDeSaida && (
+                  <Typography>{`Data de Saída: ${item.dataDeSaida}`}</Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  )}
+  {searchPerformed && filteredProducts.length === 0 && (
+    <Typography variant="body1" color="error">
+      Nenhum resultado encontrado.
+    </Typography>
+  )}
+</div>
 
-      <ModalCadastro open={openCadastro} onClose={() => setOpenCadastro(false)} fetchDados={fetchDados} />
-      <ModalInformacoes open={openInfo} onClose={() => setOpenInfo(false)} item={selectedItem} />
+
+      <ModalCadastro
+        open={openCadastro}
+        onClose={() => setOpenCadastro(false)}
+        fetchDados={fetchDados}
+      />
+      <ModalInformacoes
+        open={openInfo}
+        onClose={() => setOpenInfo(false)}
+        item={selectedItem}
+      />
     </main>
   );
 }
