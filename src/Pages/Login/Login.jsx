@@ -18,38 +18,35 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Previne o comportamento padrão do formulário
-
+    e.preventDefault();
     try {
-      const response = await axios.post("https://localhost:7001/api/Login", {
+      const response = await axios.post("http://localhost:5108/api/login", {
         email,
         password,
       });
-
-      // Armazena o token no localStorage
-      localStorage.setItem("token", response.data.token);
-      console.log(response.data.token);
-      window.location.href = "/computadores"; // Redireciona para a página de gerenciamento
+      const token = response.data.token;
+      if (token) {
+        localStorage.setItem("token", token);
+        console.log("Token salvo:", token);
+        window.location.href = "/computadores";
+      }
     } catch (err) {
       setError("E-mail e/ou senha incorreta");
       console.error(err);
     }
   };
-
   const [showPassword, setShowPassword] = React.useState(false);
-
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-
   const handleMouseUpPassword = (event) => {
     event.preventDefault();
   };
- 
+
+  console.log("Enviando:", { email, senha: password });
+
   return (
     <div className={S.tudo}>
     <img src={image} alt="" className={S.image}/>
@@ -109,7 +106,7 @@ function Login() {
                   </IconButton>
                 </InputAdornment>
               }
-              label="Password"
+              label="Senh"
             />
           </FormControl>
           <Button
@@ -125,8 +122,6 @@ function Login() {
           </Button>
         </div>
       </form>
-
-      
     </div>
   );
 }

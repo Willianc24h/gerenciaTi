@@ -33,15 +33,14 @@ function PesquisaComLupa() {
   const [selectedItem, setSelectedItem] = useState(null);
 
   const fetchDados = async () => {
-    const url = `https://localhost:7001/api/cadastro`;
     try {
-      const res = await fetch(url);
+      const res = await fetch("http://localhost:5108/api/cadastro");
       if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
-      const data = await res.json();
-      setResponse(data.dados || []);
-      setFilteredProducts(data.dados || []);
+      const data = await res.json(); // data é um array direto
+      setResponse(data);
+      setFilteredProducts(data);
     } catch (err) {
-      console.error(err.message);
+      console.error("Erro ao buscar dados:", err);
     }
   };
 
@@ -50,6 +49,11 @@ function PesquisaComLupa() {
   }, []);
 
   const handleSearchClick = () => {
+    if (!tipoPesquisa) {
+      alert("Selecione um tipo de busca!");
+      return;
+    }
+
     if (pesquisa.trim() === "") {
       alert(`Digite um ${tipoPesquisa.toLowerCase()} para pesquisar!`);
       return;
@@ -57,29 +61,34 @@ function PesquisaComLupa() {
 
     const pesquisaNormalizada = pesquisa.trim().toLowerCase();
     let resultados = [];
-
-    if (tipoPesquisa === "Setor") {
-      resultados = response.filter((item) =>
-        item.setor?.trim().toLowerCase().includes(pesquisaNormalizada)
-      );
-    } else if (tipoPesquisa === "Tag") {
-      const resultado = response.find(
-        (item) => item.tag?.trim().toLowerCase() === pesquisaNormalizada
-      );
-      if (resultado) {
-        setSelectedItem(resultado);
-        setOpenInfo(true);
-        return;
-      }
-    } else if (tipoPesquisa === "Usuario") {
-      resultados = response.filter((item) =>
-        item.usuario?.trim().toLowerCase().includes(pesquisaNormalizada)
-      );
+    
+    switch (tipoPesquisa) {
+      case "Setor":
+        resultados = response.filter((item) =>
+          item.Setor && item.Setor.toLowerCase() === pesquisaNormalizada
+        );
+        break;
+      case "Usuario":
+        resultados = response.filter((item) =>
+          item.Usuario && item.Usuario.toLowerCase().includes(pesquisaNormalizada)
+        );
+        break;
+      case "Tag":
+        const resultado = response.find(
+          (item) => item.Tag && item.Tag.toLowerCase() === pesquisaNormalizada
+        );
+        if (resultado) {
+          setSelectedItem(resultado);
+          setOpenInfo(true);
+          return;
+        }
+        break;
+      default:
+        break;
     }
 
     setFilteredProducts(resultados);
     setSearchPerformed(true);
-    
   };
 
   const handleClearSearch = () => {
@@ -92,22 +101,20 @@ function PesquisaComLupa() {
     <main className={S.pesquisa}>
       <div className={S.label}>
         <FormControl sx={{ marginRight: 4, minWidth: 180 }}>
-          <InputLabel id="demo-simple-select-helper-label">Buscar por</InputLabel>
+          <InputLabel id="select-tipo-label">Buscar por</InputLabel>
           <Select
-            labelId="demo-simple-select-helper-label"
-            onChange={(e) => setTipoPesquisa(e.target.value)}
-            id="demo-simple-select-helper"
+            labelId="select-tipo-label"
             value={tipoPesquisa}
+            onChange={(e) => setTipoPesquisa(e.target.value)}
             label="Buscar por"
           >
-            <MenuItem value="">
-              <em>Selecione</em>
-            </MenuItem>
+            <MenuItem value=""><em>Selecione</em></MenuItem>
             <MenuItem value="Setor">Setor</MenuItem>
             <MenuItem value="Tag">Tag</MenuItem>
             <MenuItem value="Usuario">Usuário</MenuItem>
           </Select>
         </FormControl>
+
         <TextField
           label="Pesquisar"
           variant="outlined"
@@ -139,8 +146,8 @@ function PesquisaComLupa() {
             sx={{
               height: "4em",
               background:
-                "linear-gradient(to bottom, #eab71b,rgb(234, 137, 27))",
-              color: "#ffffff",
+                "linear-gradient(to bottom, #eab71b, rgb(234, 137, 27))",
+              color: "#fff",
               border: "solid 1px #fff",
             }}
           >
@@ -150,46 +157,46 @@ function PesquisaComLupa() {
       </div>
 
       <div className={S.resultados}>
-  {searchPerformed && filteredProducts.length > 0 && (
-    <Box>
-      <Typography variant="h6" sx={{ marginBottom: 2 }}>
-        Resultados encontrados:
-      </Typography>
-      <Grid container spacing={2} justifyContent="space-around" alignItems="center">
-        {filteredProducts.map((item, index) => (
-          <Grid item xs={12} sm={6} md={3} lg={3} key={index}>
-            <Card
-              sx={{
-                width: 300,
-                height: 200,
-                backgroundColor: "#203e77",
-                color: "#ffffff",
-              }}
-            >
-              <CardContent>
-                <Typography variant="h6">{`Usuário: ${item.usuario}`}</Typography>
-                <Typography>{`Setor: ${item.setor}`}</Typography>
-                <Typography>{`Tag: ${item.tag}`}</Typography>
-                <Typography>{`Tipo: ${item.tipo}`}</Typography>
-                <Typography>{`Data de Entrada: ${item.dataDeEntrada}`}</Typography>
-                <Typography>{`Ativo: ${item.ativo ? "Sim" : "Não"}`}</Typography>
-                {item.dataDeSaida && (
-                  <Typography>{`Data de Saída: ${item.dataDeSaida}`}</Typography>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
-  )}
-  {searchPerformed && filteredProducts.length === 0 && (
-    <Typography variant="body1" color="error">
-      Nenhum resultado encontrado.
-    </Typography>
-  )}
-</div>
+        {searchPerformed && filteredProducts.length > 0 && (
+          <Box>
+            <Typography variant="h6" sx={{ marginBottom: 2 }}>
+              Resultados encontrados:
+            </Typography>
+            <Grid container spacing={2} justifyContent="space-around" alignItems="center">
+              {filteredProducts.map((item, index) => (
+                <Grid item xs={12} sm={6} md={3} key={item._id || index}>
+                  <Card
+                    sx={{
+                      width: 300,
+                      height: 200,
+                      backgroundColor: "#203e77",
+                      color: "#ffffff",
+                    }}
+                  >
+                    <CardContent>
+                      <Typography variant="h6">{`Usuário: ${item.Usuario}`}</Typography>
+                      <Typography>{`Setor: ${item.Setor}`}</Typography>
+                      <Typography>{`Tag: ${item.Tag}`}</Typography>
+                      <Typography>{`Tipo: ${item.Tipo}`}</Typography>
+                      <Typography>{`Data de Entrada: ${new Date(item.dataDeEntrada).toLocaleDateString()}`}</Typography>
+                      <Typography>{`Ativo: ${item.Ativo ? "Sim" : "Não"}`}</Typography>
+                      {item.dataDeSaida && (
+                        <Typography>{`Data de Saída: ${new Date(item.dataDeSaida).toLocaleDateString()}`}</Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
 
+        {searchPerformed && filteredProducts.length === 0 && (
+          <Typography variant="body1" color="error">
+            Nenhum resultado encontrado.
+          </Typography>
+        )}
+      </div>
 
       <ModalCadastro
         open={openCadastro}

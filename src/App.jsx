@@ -3,23 +3,25 @@ import Header from './Components/Header/Header'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './Pages/Login/Login'
 import Cadastramento from './Pages/Cadastramento/Cadastramento'
-import Perifericos from '../src/Pages/Perifericos/Perifericos'
+import Perifericos from './Pages/Perifericos/Perifericos'
+import Tarefas from './Pages/Tarefas/Tarefas'
 
 function App() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Header />
-      <main style={{ flex: 1 }}>
-        <BrowserRouter>
+    <BrowserRouter>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Header />
+        <main style={{ flex: 1 }}>
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/computadores" element={<Cadastramento />} />
-            <Route path="/perifericos" element={<Perifericos />} />
+            {/* <Route path="/perifericos" element={<Perifericos />} /> */}
+            <Route path="/tarefas" element={<Tarefas />} />
           </Routes>
-        </BrowserRouter>
-      </main>
-      <Footer />
-    </div>
+        </main>
+        <Footer />
+      </div>
+    </BrowserRouter>
   )
 }
 
