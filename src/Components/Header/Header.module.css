@@ -1,4 +1,27 @@
-.header{
-    background-color:#192959;
-    height: 5em;
+.header {
+  background-color: #192959;
+  height: 4em;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Alinha tudo à direita */
+  padding: 0 5em;
+}
+
+.nav {
+  display: flex;
+  gap: 5em; /* Espaçamento curto entre os botões */
+}
+
+.navButton,
+.logoutButton {
+  background: none;
+  color: white;
+  border: none;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.navButton:hover,
+.logoutButton:hover {
+  text-decoration: underline;
 }

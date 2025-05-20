@@ -10,19 +10,17 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { useState } from "react";
-import InputMask from "react-input-mask";
+import React, { useState } from "react";
+import { IMaskInput } from "react-imask";
 
 const setores = [
   "Brava",
-  "Citta",
   "Comercial",
   "CRF",
   "DaVita",
-  "Dinamicar",
   "Droom",
   "Financeiro",
-  "Operacoes",
+  "Operações",
   "Planejamento",
   "Qualidade",
   "RH",
@@ -31,12 +29,94 @@ const setores = [
 const tipos = ["Desktop", "Monitor", "Notebook"];
 const usuarios = ["Operador", "Supervisor", "Backoffice", "Qualidade", "Outro"];
 
+// Componente máscara de data
+const DateMask = React.forwardRef((props, ref) => {
+  const { onChange, ...other } = props;
+  return (
+    <IMaskInput
+      {...other}
+      mask={Date}
+      pattern="d`/`m`/`Y"
+      blocks={{
+        d: { mask: IMask.MaskedRange, from: 1, to: 31 },
+        m: { mask: IMask.MaskedRange, from: 1, to: 12 },
+        Y: { mask: IMask.MaskedRange, from: 1900, to: 21000 },
+      }}
+      inputRef={ref}
+      onAccept={(value) => onChange({ target: { name: props.name, value } })}
+      overwrite
+    />
+  );
+});
+DateMask.displayName = "DateMask";
+
 const convertToAPIFormat = (dateString) => {
   if (!dateString) return null;
   const [day, month, year] = dateString.split("/");
   return `${year}-${month}-${day}`;
 };
 
+// Componente genérico TextField
+function TextInput({ name, label, value, onChange, required, sx, InputProps }) {
+  return (
+    <TextField
+      name={name}
+      label={label}
+      value={value}
+      onChange={onChange}
+      required={required}
+      sx={{ marginBottom: "1em", width: "100%", ...sx }}
+      InputProps={InputProps}
+    />
+  );
+}
+
+// Componente genérico SelectField
+function SelectField({ name, label, value, onChange, options, sx, displayEmpty = true }) {
+  return (
+    <Select
+      name={name}
+      value={value}
+      onChange={onChange}
+      displayEmpty={displayEmpty}
+      fullWidth
+      sx={{ marginBottom: "1em", ...sx }}
+    >
+      <MenuItem value="" disabled>
+        {label}
+      </MenuItem>
+      {options.map((option) => (
+        <MenuItem key={option} value={option}>
+          {option}
+        </MenuItem>
+      ))}
+    </Select>
+  );
+}
+
+// Componente CheckboxField
+function CheckboxField({ checked, onChange, name, label }) {
+  return (
+    <FormControlLabel
+      control={
+        <Checkbox
+          sx={{
+            color: "#192959",
+            "&.Mui-checked": {
+              color: "#192959",
+            },
+          }}
+          checked={checked}
+          onChange={onChange}
+          name={name}
+        />
+      }
+      label={label}
+    />
+  );
+}
+
+// Componente principal do Modal com o formulário
 function ModalCadastro({ open, onClose, fetchDados }) {
   const [formData, setFormData] = useState({
     Setor: "",
@@ -45,12 +125,13 @@ function ModalCadastro({ open, onClose, fetchDados }) {
     dataDeSaida: "",
     Tipo: "",
     Usuario: "",
-    OutroUsuario: "",
+    outroUsuario: "",
     NFE: "",
     Ativo: false,
   });
 
   const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -69,37 +150,37 @@ function ModalCadastro({ open, onClose, fetchDados }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    // Verifica se o usuário escolheu a opção "Outro" e preenche o campo Usuario com o valor de OutroUsuario
-    const usuarioFinal =
-      formData.Usuario === "Outro" ? formData.OutroUsuario : formData.Usuario;
-
-    const url = "https://localhost:7001/api/cadastro";
+    const url = "http://localhost:5108/api/cadastro";
 
     const dataDeEntradaFormatada = convertToAPIFormat(formData.dataDeEntrada);
     const dataDeSaidaFormatada = convertToAPIFormat(formData.dataDeSaida);
 
     const formDataToSend = {
-      ...formData,
-      Usuario: usuarioFinal, // Atualiza o campo Usuario
+      Tag: formData.Tag,
+      Setor: formData.Setor,
       dataDeEntrada: dataDeEntradaFormatada,
       dataDeSaida: dataDeSaidaFormatada,
+      Tipo: formData.Tipo,
+      Usuario: formData.Usuario,
+      outroUsuario: formData.Usuario === "Outro" ? formData.outroUsuario : undefined,
+      NFE: formData.NFE,
+      Ativo: formData.Ativo,
     };
 
     try {
-      // Envia os dados para a API
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formDataToSend),
       });
 
-      if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Erro ao cadastrar");
+      }
 
-      // Dados salvos com sucesso, agora buscamos os dados atualizados
-      fetchDados();
-
-      // Fecha o modal e limpa os campos
       setSuccessModalOpen(true);
       setFormData({
         Setor: "",
@@ -108,13 +189,17 @@ function ModalCadastro({ open, onClose, fetchDados }) {
         dataDeSaida: "",
         Tipo: "",
         Usuario: "",
-        OutroUsuario: "",
+        outroUsuario: "",
         NFE: "",
-        Ativo: false,
+        Ativo: true,
       });
       onClose();
     } catch (err) {
-      console.error(err.message);
+      console.error("Erro completo:", err);
+      alert(err.message);
+    } finally {
+      fetchDados();
+      setIsLoading(false);
     }
   };
 
@@ -139,133 +224,77 @@ function ModalCadastro({ open, onClose, fetchDados }) {
           <Typography variant="h6" mb={2} sx={{ color: "#f8b005" }}>
             Novo Equipamento
           </Typography>
-          <TextField
+
+          <TextInput
             name="Tag"
             label="Tag"
             value={formData.Tag}
             onChange={handleInputChange}
             required
-            sx={{ marginBottom: "1em", width: "100%" }}
           />
 
-          <Select
+          <SelectField
             name="Setor"
+            label="Selecione um setor"
             value={formData.Setor}
             onChange={handleInputChange}
-            displayEmpty
-            fullWidth
-            sx={{ marginBottom: "1em" }}
-          >
-            <MenuItem value="" disabled>
-              Selecione um setor
-            </MenuItem>
-            {setores.map((setor) => (
-              <MenuItem key={setor} value={setor}>
-                {setor}
-              </MenuItem>
-            ))}
-          </Select>
+            options={setores}
+          />
 
-          <InputMask
-            mask="99/99/9999"
+          <TextInput
+            name="dataDeEntrada"
+            label="Data de Entrada"
             value={formData.dataDeEntrada}
             onChange={handleInputChange}
-          >
-            {(inputProps) => (
-              <TextField
-                {...inputProps}
-                name="dataDeEntrada"
-                label="Data de Entrada"
-                required
-                sx={{ marginBottom: "1em", width: "100%" }}
-              />
-            )}
-          </InputMask>
+            required
+            InputProps={{ inputComponent: DateMask }}
+          />
 
-          <InputMask
-            mask="99/99/9999"
+          <TextInput
+            name="dataDeSaida"
+            label="Data de Saída"
             value={formData.dataDeSaida}
             onChange={handleInputChange}
-          >
-            {(inputProps) => (
-              <TextField
-                {...inputProps}
-                name="dataDeSaida"
-                label="Data de Saída"
-                sx={{ marginBottom: "1em", width: "100%" }}
-              />
-            )}
-          </InputMask>
+            InputProps={{ inputComponent: DateMask }}
+          />
 
-          <Select
+          <SelectField
             name="Usuario"
+            label="Selecione um usuário"
             value={formData.Usuario}
             onChange={handleInputChange}
-            displayEmpty
-            fullWidth
-            sx={{ marginBottom: "1em" }}
-          >
-            <MenuItem value="" disabled>
-              Selecione um usuário
-            </MenuItem>
-            {usuarios.map((usuario) => (
-              <MenuItem key={usuario} value={usuario}>
-                {usuario}
-              </MenuItem>
-            ))}
-          </Select>
+            options={usuarios}
+          />
 
           {formData.Usuario === "Outro" && (
-            <TextField
-              name="OutroUsuario"
+            <TextInput
+              name="outroUsuario"
               label="Especifique"
-              value={formData.OutroUsuario}
+              value={formData.outroUsuario}
               onChange={handleInputChange}
-              sx={{ marginBottom: "1em", width: "100%" }}
             />
           )}
 
-          <Select
+          <SelectField
             name="Tipo"
+            label="Selecione um tipo"
             value={formData.Tipo}
             onChange={handleInputChange}
-            displayEmpty
-            fullWidth
-            sx={{ marginBottom: "1em" }}
-          >
-            <MenuItem value="" disabled>
-              Selecione um tipo
-            </MenuItem>
-            {tipos.map((tipo) => (
-              <MenuItem key={tipo} value={tipo}>
-                {tipo}
-              </MenuItem>
-            ))}
-          </Select>
+            options={tipos}
+          />
 
-          <TextField
+          <TextInput
             name="NFE"
             label="NFE"
             value={formData.NFE}
             onChange={handleInputChange}
             required
-            sx={{ marginBottom: "1em", width: "100%" }}
           />
 
-          <FormControlLabel
-            control={
-              <Checkbox
-                sx={{
-                  color: "#192959",
-                  "&.Mui-checked": {
-                    color: "#192959",
-                  },
-                }}
-                checked={formData.Ativo}
-                onChange={handleCheckboxChange}
-                name="Ativo"
-              />
-            }
+          <CheckboxField
+            checked={formData.Ativo}
+            onChange={handleCheckboxChange}
+            name="Ativo"
             label="Ativo"
           />
 
@@ -273,8 +302,11 @@ function ModalCadastro({ open, onClose, fetchDados }) {
             <Button
               type="submit"
               variant="contained"
-              sx={{ background: 'linear-gradient(to bottom,rgb(248, 179, 88),rgb(252, 203, 69))' }}
-              onClick={handleSubmit}
+              disabled={isLoading}
+              sx={{
+                background:
+                  "linear-gradient(to bottom,rgb(248, 179, 88),rgb(252, 203, 69))",
+              }}
             >
               Salvar
             </Button>

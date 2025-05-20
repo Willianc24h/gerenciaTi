@@ -22,13 +22,15 @@ function ModalInformacoes({ open, onClose, item }) {
         {item ? (
           <>
             <Typography variant="h6">Informações da Tag</Typography>
-            <Typography><strong>Tag:</strong> {item.tag}</Typography>
-            <Typography><strong>Setor:</strong> {item.setor}</Typography>
-            <Typography><strong>Data de Entrada:</strong> {item.dataDeEntrada}</Typography>
-            <Typography><strong>Data de Saída:</strong> {item.dataDeSaida}</Typography>
-            <Typography><strong>Tipo:</strong> {item.tipo}</Typography>
-            <Typography><strong>NFE:</strong> {item.nfe}</Typography>
-            <Typography><strong>Ativo:</strong> {item.ativo ? "Sim" : "Não"}</Typography>
+            <Typography variant="h6">{`Usuário: ${item.Usuario}`}</Typography>
+                      <Typography>{`Setor: ${item.Setor}`}</Typography>
+                      <Typography>{`Tag: ${item.Tag}`}</Typography>
+                      <Typography>{`Tipo: ${item.Tipo}`}</Typography>
+                      <Typography>{`Data de Entrada: ${new Date(item.dataDeEntrada).toLocaleDateString()}`}</Typography>
+                      {item.dataDeSaida && (
+                        <Typography>{`Data de Saída: ${new Date(item.dataDeSaida).toLocaleDateString()}`}</Typography>
+                      )}
+                      <Typography>{`Ativo: ${item.Ativo ? "Sim" : "Não"}`}</Typography>
             <Button onClick={onClose}
             sx={{
                 height: "3em",

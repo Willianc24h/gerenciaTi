@@ -72,21 +72,53 @@ export default function BasicCard() {
 
   // Fetch data from API
   const fetchData = async () => {
-    const url = `https://localhost:7001/api/cadastro`;
-    try {
-      const response = await fetch(url);
-      const result = await response.json();
+  const url = `http://localhost:5108/api/cadastro`;
+  let response;
 
-      if (Array.isArray(result.dados)) {
-        setData(result.dados);
-        countActiveAndInactive(result.dados);
-      } else {
-        throw new Error("Formato de dados inválido");
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dados:", error);
+  try {
+    response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Erro HTTP: ${response.status}`);
     }
-  };
+
+    const result = await response.json();
+
+    if (Array.isArray(result.dados)) {
+      const mappedData = result.dados.map(item => ({
+        Tag: item.tag,
+        setor: item.setor,
+        dataDeEntrada: item.dataDeEntrada,
+        dataDeSaida: item.dataDeSaida,
+        usuario: item.usuario,
+        tipo: item.tipo,
+        nfe: item.nfe,
+        ativo: item.ativo
+      }));
+
+      setData(mappedData);
+      countActiveAndInactive(mappedData);
+    } else {
+      throw new Error("Formato de dados inválido");
+    }
+  } catch (error) {
+    console.error("Erro ao buscar dados:", error.message);
+
+    if (response) {
+      try {
+        const text = await response.text();
+        console.log("Texto da resposta bruta:", text);
+      } catch {
+        console.log("Não foi possível ler o conteúdo da resposta.");
+      }
+    } else {
+      console.log("A resposta não foi recebida. Verifique se a API está online.");
+    }
+  }
+};
+
+
+
 
   // Count active and inactive machines
   const countActiveAndInactive = (data) => {
@@ -103,12 +135,12 @@ export default function BasicCard() {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `https://localhost:7001/api/cadastro/${selectedItem.tag}`,
+        `http://localhost:5108/api/cadastro/${selectedItem.Tag}`,
         { method: "DELETE" }
       );
 
       if (response.ok) {
-        console.log(`Item com Tag: ${selectedItem.tag} excluído com sucesso.`);
+        console.log(`Item com Tag: ${selectedItem.Tag} excluído com sucesso.`);
         fetchData(); // Atualiza os dados após exclusão
       } else {
         throw new Error("Erro ao excluir item");
@@ -141,7 +173,7 @@ export default function BasicCard() {
 
     const updatedItem = { ...selectedItem };
 
-    const url = `https://localhost:7001/api/cadastro/${updatedItem.tag}`;
+    const url = `http://localhost:5108/api/cadastro/${updatedItem.Tag}`;
     try {
       const response = await fetch(url, {
         method: "PUT",
@@ -153,7 +185,7 @@ export default function BasicCard() {
 
       setData((prevData) =>
         prevData.map((item) =>
-          item.tag === updatedItem.tag ? updatedItem : item
+          item.Tag === updatedItem.Tag ? updatedItem : item
         )
       );
 
@@ -169,13 +201,13 @@ export default function BasicCard() {
   };
 
   const inativarCadastro = async () => {
-    if (!selectedItem || !selectedItem.tag) {
+    if (!selectedItem || !selectedItem.Tag) {
       console.error("Erro: Tag não fornecida para inativar.");
       setInactivateModalOpen(false); // Fecha o modal caso haja erro
       return;
     }
 
-    const url = `https://localhost:7001/api/cadastro/inativa/${selectedItem.tag}`;
+    const url = `http://localhost:5108/api/cadastro/inativa/${selectedItem.Tag}`;
     try {
       const response = await fetch(url, {
         method: "PUT",
@@ -190,7 +222,7 @@ export default function BasicCard() {
       }
 
       console.log(
-        `Cadastro com Tag: ${selectedItem.tag} inativado com sucesso.`
+        `Cadastro com Tag: ${selectedItem.Tag} inativado com sucesso.`
       );
       fetchData(); // Atualiza os dados após inativar
     } catch (error) {
@@ -267,7 +299,7 @@ export default function BasicCard() {
                     }}
                     component="div"
                   >
-                    {item.tag}
+                    {item.Tag}
                   </Typography>
                   <Typography
                     variant="h6"
@@ -365,11 +397,11 @@ export default function BasicCard() {
                 label="Tag"
                 fullWidth
                 margin="normal"
-                value={selectedItem.tag || ""}
+                value={selectedItem.Tag || ""}
                 onChange={(e) => {
                   setSelectedItem({
                     ...selectedItem,
-                    tag: e.target.value,
+                    Tag: e.target.value,
                   });
                 }}
                 InputLabelProps={{
@@ -529,7 +561,7 @@ export default function BasicCard() {
           </Typography>
           <Typography sx={{ fontFamily: "Roboto" }}>
             Deseja realmente excluir o item com Tag:{" "}
-            <strong>{selectedItem?.tag}</strong>?
+            <strong>{selectedItem?.Tag}</strong>?
           </Typography>
           <Box sx={{ mt: 3, display: "flex", justifyContent: "space-around" }}>
             <Button
