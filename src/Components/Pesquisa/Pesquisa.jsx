@@ -9,11 +9,11 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
+  Grid2,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
@@ -34,11 +34,11 @@ function PesquisaComLupa() {
 
   const fetchDados = async () => {
     try {
-      const res = await fetch("http://localhost:5108/api/cadastro");
+      const res = await fetch("http://192.168.45.83:8080/api/computador");
       if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
-      const data = await res.json(); // data é um array direto
-      setResponse(data);
-      setFilteredProducts(data);
+      const data = await res.json();
+      setResponse(data.dados);
+      setFilteredProducts(data.dados);
     } catch (err) {
       console.error("Erro ao buscar dados:", err);
     }
@@ -61,21 +61,24 @@ function PesquisaComLupa() {
 
     const pesquisaNormalizada = pesquisa.trim().toLowerCase();
     let resultados = [];
-    
+
     switch (tipoPesquisa) {
       case "Setor":
-        resultados = response.filter((item) =>
-          item.Setor && item.Setor.toLowerCase() === pesquisaNormalizada
+        resultados = response.filter(
+          (item) =>
+            item.setor && item.setor.toLowerCase() === pesquisaNormalizada
         );
         break;
-      case "Usuario":
-        resultados = response.filter((item) =>
-          item.Usuario && item.Usuario.toLowerCase().includes(pesquisaNormalizada)
+      case "Usuário":
+        resultados = response.filter(
+          (item) =>
+            item.usuario &&
+            item.usuario.toLowerCase().includes(pesquisaNormalizada)
         );
         break;
       case "Tag":
         const resultado = response.find(
-          (item) => item.Tag && item.Tag.toLowerCase() === pesquisaNormalizada
+          (item) => item.tag && item.tag.toLowerCase() === pesquisaNormalizada
         );
         if (resultado) {
           setSelectedItem(resultado);
@@ -108,10 +111,12 @@ function PesquisaComLupa() {
             onChange={(e) => setTipoPesquisa(e.target.value)}
             label="Buscar por"
           >
-            <MenuItem value=""><em>Selecione</em></MenuItem>
+            <MenuItem value="">
+              <em>Selecione</em>
+            </MenuItem>
             <MenuItem value="Setor">Setor</MenuItem>
             <MenuItem value="Tag">Tag</MenuItem>
-            <MenuItem value="Usuario">Usuário</MenuItem>
+            <MenuItem value="Usuário">Usuário</MenuItem>
           </Select>
         </FormControl>
 
@@ -159,12 +164,18 @@ function PesquisaComLupa() {
       <div className={S.resultados}>
         {searchPerformed && filteredProducts.length > 0 && (
           <Box>
-            <Typography variant="h6" sx={{ marginBottom: 2 }}>
+            <Typography variant="h6" sx={{ marginBottom: 2, textAlign: 'center' }}>
               Resultados encontrados:
             </Typography>
-            <Grid container spacing={2} justifyContent="space-around" alignItems="center">
+            <Grid2
+              container
+              spacing={2}
+              display="flex"
+              justifyContent="space-around" // centraliza os cards
+              alignItems="center"
+            >
               {filteredProducts.map((item, index) => (
-                <Grid item xs={12} sm={6} md={3} key={item._id || index}>
+                <Grid2 item xs={12} sm={6} md={3} key={item._id || index}>
                   <Card
                     sx={{
                       width: 300,
@@ -174,20 +185,26 @@ function PesquisaComLupa() {
                     }}
                   >
                     <CardContent>
-                      <Typography variant="h6">{`Usuário: ${item.Usuario}`}</Typography>
-                      <Typography>{`Setor: ${item.Setor}`}</Typography>
-                      <Typography>{`Tag: ${item.Tag}`}</Typography>
-                      <Typography>{`Tipo: ${item.Tipo}`}</Typography>
-                      <Typography>{`Data de Entrada: ${new Date(item.dataDeEntrada).toLocaleDateString()}`}</Typography>
-                      <Typography>{`Ativo: ${item.Ativo ? "Sim" : "Não"}`}</Typography>
+                      <Typography variant="h6">{`Usuário: ${item.usuario}`}</Typography>
+                      <Typography>{`Setor: ${item.setor}`}</Typography>
+                      <Typography>{`Tag: ${item.tag}`}</Typography>
+                      <Typography>{`Tipo: ${item.tipo}`}</Typography>
+                      <Typography>{`Data de Entrada: ${new Date(
+                        item.dataDeEntrada
+                      ).toLocaleDateString()}`}</Typography>
+                      <Typography>{`Ativo: ${
+                        item.ativo ? "Sim" : "Não"
+                      }`}</Typography>
                       {item.dataDeSaida && (
-                        <Typography>{`Data de Saída: ${new Date(item.dataDeSaida).toLocaleDateString()}`}</Typography>
+                        <Typography>{`Data de Saída: ${new Date(
+                          item.dataDeSaida
+                        ).toLocaleDateString()}`}</Typography>
                       )}
                     </CardContent>
                   </Card>
-                </Grid>
+                </Grid2>
               ))}
-            </Grid>
+            </Grid2>
           </Box>
         )}
 

@@ -6,6 +6,7 @@ import Cadastramento from './Pages/Cadastramento/Cadastramento'
 import Perifericos from './Pages/Perifericos/Perifericos'
 import Tarefas from './Pages/Tarefas/Tarefas'
 
+
 function App() {
   return (
     <BrowserRouter>
@@ -15,8 +16,9 @@ function App() {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/computadores" element={<Cadastramento />} />
+            {/* <Route path="/usuario" element={<Usuarios />} /> */}
             {/* <Route path="/perifericos" element={<Perifericos />} /> */}
-            <Route path="/tarefas" element={<Tarefas />} />
+            {/* <Route path="/tarefas" element={<Tarefas />} /> */}
           </Routes>
         </main>
         <Footer />
