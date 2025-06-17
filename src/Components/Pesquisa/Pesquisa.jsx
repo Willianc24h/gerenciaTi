@@ -62,30 +62,36 @@ function PesquisaComLupa() {
     const pesquisaNormalizada = pesquisa.trim().toLowerCase();
     let resultados = [];
     
-    switch (tipoPesquisa) {
-      case "Setor":
-        resultados = response.filter((item) =>
-          item.Setor && item.Setor.toLowerCase() === pesquisaNormalizada
-        );
-        break;
-      case "Usuario":
-        resultados = response.filter((item) =>
-          item.Usuario && item.Usuario.toLowerCase().includes(pesquisaNormalizada)
-        );
-        break;
-      case "Tag":
-        const resultado = response.find(
-          (item) => item.Tag && item.Tag.toLowerCase() === pesquisaNormalizada
-        );
-        if (resultado) {
-          setSelectedItem(resultado);
-          setOpenInfo(true);
-          return;
-        }
-        break;
-      default:
-        break;
+switch (tipoPesquisa) {
+  case "Setor":
+    resultados = response.filter((item) =>
+      item.Setor && item.Setor.toLowerCase() === pesquisaNormalizada
+    );
+    break;
+
+  case "Usuario":
+    resultados = response.filter((item) =>
+      item.Usuario && item.Usuario.toLowerCase().includes(pesquisaNormalizada)
+    );
+    break;
+
+  case "Tag": {
+    const resultado = response.find(
+      (item) => item.Tag && item.Tag.toLowerCase() === pesquisaNormalizada
+    );
+    if (resultado) {
+      setSelectedItem(resultado);
+      setOpenInfo(true);
+      return; // retorna antes de setar `setFilteredProducts`
+    } else {
+      resultados = []; // garante que exiba "nenhum resultado encontrado"
     }
+    break;
+  }
+
+  default:
+    break;
+}
 
     setFilteredProducts(resultados);
     setSearchPerformed(true);
