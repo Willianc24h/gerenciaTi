@@ -61,8 +61,7 @@ function PesquisaComLupa() {
 
     const pesquisaNormalizada = pesquisa.trim().toLowerCase();
     let resultados = [];
-
-    switch (tipoPesquisa) {
+switch (tipoPesquisa) {
       case "Setor":
         resultados = response.filter(
           (item) =>
