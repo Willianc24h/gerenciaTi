@@ -152,7 +152,7 @@ function ModalCadastro({ open, onClose, fetchDados }) {
     e.preventDefault();
     setIsLoading(true);
 
-    const url = "http://localhost:5108/api/cadastro";
+    const url = "http://192.168.5.32:5108/api/cadastro";
 
     const dataDeEntradaFormatada = convertToAPIFormat(formData.dataDeEntrada);
     const dataDeSaidaFormatada = convertToAPIFormat(formData.dataDeSaida);
@@ -258,22 +258,13 @@ function ModalCadastro({ open, onClose, fetchDados }) {
             InputProps={{ inputComponent: DateMask }}
           />
 
-          <SelectField
+          <TextInput
             name="Usuario"
-            label="Selecione um usuário"
+            label="Usuário"
             value={formData.Usuario}
             onChange={handleInputChange}
             options={usuarios}
           />
-
-          {formData.Usuario === "Outro" && (
-            <TextInput
-              name="outroUsuario"
-              label="Especifique"
-              value={formData.outroUsuario}
-              onChange={handleInputChange}
-            />
-          )}
 
           <SelectField
             name="Tipo"
@@ -303,6 +294,7 @@ function ModalCadastro({ open, onClose, fetchDados }) {
               type="submit"
               variant="contained"
               disabled={isLoading}
+              onClick={handleSubmit}
               sx={{
                 background:
                   "linear-gradient(to bottom,rgb(248, 179, 88),rgb(252, 203, 69))",

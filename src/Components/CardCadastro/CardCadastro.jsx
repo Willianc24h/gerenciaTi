@@ -12,7 +12,7 @@ import {
   FormControl,
   InputLabel,
   Typography,
-  Grid,
+  Grid2,
   Modal,
   TextField,
 } from "@mui/material";
@@ -28,16 +28,13 @@ export default function BasicCard() {
   const [activeCount, setActiveCount] = useState(0);
   const [inactiveCount, setInactiveCount] = useState(0);
   const [refresh, setRefresh] = useState(false);
-  const [itemsToShow, setItemsToShow] = useState(8);
+  const [itemsToShow, setItemsToShow] = useState(10);
 
   const setores = [
     "Brava",
-    "Citta",
     "Comercial",
     "CRF",
     "DaVita",
-    "Dinamicar",
-    "Droom",
     "Financeiro",
     "Operacoes",
     "Planejamento",
@@ -47,14 +44,6 @@ export default function BasicCard() {
   ];
 
   const tipos = ["Desktop", "Monitor", "Notebook"];
-  const usuarios = [
-    "Operador",
-    "Supervisor",
-    "Backoffice",
-    "Qualidade",
-    "Outro",
-  ];
-
   // Modal style
   const style = {
     position: "absolute",
@@ -72,53 +61,52 @@ export default function BasicCard() {
 
   // Fetch data from API
   const fetchData = async () => {
-  const url = `http://localhost:5108/api/cadastro`;
-  let response;
+    const url = `http://192.168.5.32:5108/api/cadastro`;
+    let response;
 
-  try {
-    response = await fetch(url);
+    try {
+      response = await fetch(url);
 
-    if (!response.ok) {
-      throw new Error(`Erro HTTP: ${response.status}`);
-    }
-
-    const result = await response.json();
-
-    if (Array.isArray(result.dados)) {
-      const mappedData = result.dados.map(item => ({
-        Tag: item.tag,
-        setor: item.setor,
-        dataDeEntrada: item.dataDeEntrada,
-        dataDeSaida: item.dataDeSaida,
-        usuario: item.usuario,
-        tipo: item.tipo,
-        nfe: item.nfe,
-        ativo: item.ativo
-      }));
-
-      setData(mappedData);
-      countActiveAndInactive(mappedData);
-    } else {
-      throw new Error("Formato de dados inválido");
-    }
-  } catch (error) {
-    console.error("Erro ao buscar dados:", error.message);
-
-    if (response) {
-      try {
-        const text = await response.text();
-        console.log("Texto da resposta bruta:", text);
-      } catch {
-        console.log("Não foi possível ler o conteúdo da resposta.");
+      if (!response.ok) {
+        throw new Error(`Erro HTTP: ${response.status}`);
       }
-    } else {
-      console.log("A resposta não foi recebida. Verifique se a API está online.");
+
+      const result = await response.json();
+
+      if (Array.isArray(result.dados)) {
+        const mappedData = result.dados.map((item) => ({
+          Tag: item.tag,
+          setor: item.setor,
+          dataDeEntrada: item.dataDeEntrada,
+          dataDeSaida: item.dataDeSaida,
+          usuario: item.usuario,
+          tipo: item.tipo,
+          nfe: item.nfe,
+          ativo: item.ativo,
+        }));
+
+        setData(mappedData);
+        countActiveAndInactive(mappedData);
+      } else {
+        throw new Error("Formato de dados inválido");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar dados:", error.message);
+
+      if (response) {
+        try {
+          const text = await response.text();
+          console.log("Texto da resposta bruta:", text);
+        } catch {
+          console.log("Não foi possível ler o conteúdo da resposta.");
+        }
+      } else {
+        console.log(
+          "A resposta não foi recebida. Verifique se a API está online."
+        );
+      }
     }
-  }
-};
-
-
-
+  };
 
   // Count active and inactive machines
   const countActiveAndInactive = (data) => {
@@ -135,7 +123,7 @@ export default function BasicCard() {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5108/api/cadastro/${selectedItem.Tag}`,
+        `http://192.168.5.32:5108/api/cadastro/${selectedItem.Tag}`,
         { method: "DELETE" }
       );
 
@@ -173,7 +161,7 @@ export default function BasicCard() {
 
     const updatedItem = { ...selectedItem };
 
-    const url = `http://localhost:5108/api/cadastro/${updatedItem.Tag}`;
+    const url = `http://192.168.5.32:5108/api/cadastro/${updatedItem.Tag}`;
     try {
       const response = await fetch(url, {
         method: "PUT",
@@ -197,7 +185,7 @@ export default function BasicCard() {
   };
 
   const handleLoadMore = () => {
-    setItemsToShow((prev) => prev + 8); // Incrementa 8 itens a cada clique
+    setItemsToShow((prev) => prev + 10); // Incrementa 8 itens a cada clique
   };
 
   const inativarCadastro = async () => {
@@ -207,7 +195,7 @@ export default function BasicCard() {
       return;
     }
 
-    const url = `http://localhost:5108/api/cadastro/inativa/${selectedItem.Tag}`;
+    const url = `http://192.168.5.32:5108/api/cadastro/inativa/${selectedItem.Tag}`;
     try {
       const response = await fetch(url, {
         method: "PUT",
@@ -277,15 +265,16 @@ export default function BasicCard() {
       <br />
       <br />
       <br />
-      <Grid container spacing={2} justifyContent="space-around">
+      <Grid2 container spacing={2} justifyContent="space-between">
         {data.length > 0 ? (
-          data.map((item, index) => (
-            <Grid item xs={9} sm={6} md={4} lg={3} key={index}>
-              <Card sx={{ Width: 120 }}>
+          data.slice(0, itemsToShow).map((item, index) => (
+            <Grid2 item xs={12} sm={9} md={6} lg={3} key={index}>
+              <Card sx={{ Width: 400 }}>
                 <CardContent
                   sx={{
                     textAlign: "left",
                     padding: "1em",
+                    width: "12em",
                     borderBottom: "1px solid #D3D3D3",
                   }}
                 >
@@ -349,34 +338,36 @@ export default function BasicCard() {
                   </CardActions>
                 </div>
               </Card>
-            </Grid>
+            </Grid2>
           ))
         ) : (
           <Typography variant="h6">Nenhum dado encontrado.</Typography>
         )}
-      </Grid>
+      </Grid2>
       <br />
       <br />
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          mt: 2,
-        }}
-      >
-        <Button
-          variant="contained"
+      {itemsToShow < data.length && (
+        <Box
           sx={{
-            color: "#fff",
-            backgroundColor: "#eab71b",
-            mt: 3,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            mt: 2,
           }}
-          onClick={handleLoadMore}
         >
-          Carregar Mais
-        </Button>
-      </Box>
+          <Button
+            variant="contained"
+            sx={{
+              color: "#fff",
+              backgroundColor: "#eab71b",
+              mt: 3,
+            }}
+            onClick={handleLoadMore}
+          >
+            Carregar Mais
+          </Button>
+        </Box>
+      )}
       {/* Modal for editing */}
       <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)}>
         <Box sx={style}>
@@ -407,6 +398,7 @@ export default function BasicCard() {
                 InputLabelProps={{
                   shrink: true,
                 }}
+                disabled
               />
               <FormControl fullWidth margin="normal">
                 <InputLabel>Setor</InputLabel>
@@ -478,41 +470,19 @@ export default function BasicCard() {
                 }}
               />
               <FormControl fullWidth margin="normal">
-                <InputLabel>Usuário</InputLabel>
-                <Select
-                  value={selectedItem.usuario || ""}
+                <TextField
                   label="Usuário"
+                  value={selectedItem.usuario || ""}
                   onChange={(e) => {
                     setSelectedItem({
                       ...selectedItem,
                       usuario: e.target.value,
                     });
                   }}
-                >
-                  {usuarios.map((usuario) => (
-                    <MenuItem key={usuario} value={usuario}>
-                      {usuario}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              {selectedItem.usuario === "Outro" && (
-                <TextField
-                  label="Especifique"
                   fullWidth
-                  margin="normal"
-                  value={selectedItem.outroUsuario || ""}
-                  onChange={(e) => {
-                    setSelectedItem({
-                      ...selectedItem,
-                      outroUsuario: e.target.value,
-                    });
-                  }}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
                 />
-              )}
+              </FormControl>
+
               <Button
                 variant="contained"
                 color="secondary"

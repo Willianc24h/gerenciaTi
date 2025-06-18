@@ -22,15 +22,15 @@ function ModalInformacoes({ open, onClose, item }) {
         {item ? (
           <>
             <Typography variant="h6">Informações da Tag</Typography>
-            <Typography variant="h6">{`Usuário: ${item.Usuario}`}</Typography>
-                      <Typography>{`Setor: ${item.Setor}`}</Typography>
-                      <Typography>{`Tag: ${item.Tag}`}</Typography>
-                      <Typography>{`Tipo: ${item.Tipo}`}</Typography>
+            <Typography variant="h6">{`Usuário: ${item.usuario}`}</Typography>
+                      <Typography>{`Setor: ${item.setor}`}</Typography>
+                      <Typography>{`Tag: ${item.tag}`}</Typography>
+                      <Typography>{`Tipo: ${item.tipo}`}</Typography>
                       <Typography>{`Data de Entrada: ${new Date(item.dataDeEntrada).toLocaleDateString()}`}</Typography>
                       {item.dataDeSaida && (
                         <Typography>{`Data de Saída: ${new Date(item.dataDeSaida).toLocaleDateString()}`}</Typography>
                       )}
-                      <Typography>{`Ativo: ${item.Ativo ? "Sim" : "Não"}`}</Typography>
+                      <Typography>{`Ativo: ${item.Ativo ? "Não" : "Sim"}`}</Typography>
             <Button onClick={onClose}
             sx={{
                 height: "3em",

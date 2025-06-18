@@ -12,8 +12,8 @@ function Header() {
 
   // Definir os links de navegação com base na página atual
   const navMap = {
-    "/computadores": ["tarefas"],
-    "/tarefas": ["computadores"],
+    "/computadores": ["usuario"],
+    "/usuario" : ["computadores"]
   };
 
   const links = navMap[currentPath] || [];
