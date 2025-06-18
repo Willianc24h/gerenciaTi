@@ -34,7 +34,7 @@ function PesquisaComLupa() {
 
   const fetchDados = async () => {
     try {
-      const res = await fetch("http://192.168.45.83:8080/api/computador");
+      const res = await fetch("http://192.168.5.32:5108/api/cadastro");
       if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
       const data = await res.json();
       setResponse(data.dados);

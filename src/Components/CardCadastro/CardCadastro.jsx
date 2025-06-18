@@ -32,12 +32,9 @@ export default function BasicCard() {
 
   const setores = [
     "Brava",
-    "Citta",
     "Comercial",
     "CRF",
     "DaVita",
-    "Dinamicar",
-    "Droom",
     "Financeiro",
     "Operacoes",
     "Planejamento",
@@ -64,7 +61,7 @@ export default function BasicCard() {
 
   // Fetch data from API
   const fetchData = async () => {
-    const url = `http://192.168.45.83:8080/api/computador`;
+    const url = `http://192.168.5.32:5108/api/cadastro`;
     let response;
 
     try {
@@ -126,7 +123,7 @@ export default function BasicCard() {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5108/api/cadastro/${selectedItem.Tag}`,
+        `http://192.168.5.32:5108/api/cadastro/${selectedItem.Tag}`,
         { method: "DELETE" }
       );
 
@@ -164,7 +161,7 @@ export default function BasicCard() {
 
     const updatedItem = { ...selectedItem };
 
-    const url = `http://localhost:5108/api/cadastro/${updatedItem.Tag}`;
+    const url = `http://192.168.5.32:5108/api/cadastro/${updatedItem.Tag}`;
     try {
       const response = await fetch(url, {
         method: "PUT",
@@ -198,7 +195,7 @@ export default function BasicCard() {
       return;
     }
 
-    const url = `http://localhost:5108/api/cadastro/inativa/${selectedItem.Tag}`;
+    const url = `http://192.168.5.32:5108/api/cadastro/inativa/${selectedItem.Tag}`;
     try {
       const response = await fetch(url, {
         method: "PUT",
