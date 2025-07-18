@@ -1,0 +1,27 @@
+.resultados {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.card {
+  background-color: #203e77;
+  color: #ffffff;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.usuario {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.setor, .tag, .tipo, .dataEntrada, .ativo {
+  margin-top: 5px;
+  color: #e0e0e0;
+}

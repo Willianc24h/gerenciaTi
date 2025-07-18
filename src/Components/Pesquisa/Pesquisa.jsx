@@ -1,56 +1,65 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   TextField,
-  InputAdornment,
-  IconButton,
-  Stack,
   Button,
   Box,
-  Card,
-  CardContent,
-  Typography,
-  Select,
-  MenuItem,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   FormControl,
   InputLabel,
-  Grid2,
+  MenuItem,
+  Select,
+  Typography,
 } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
-import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import CloseIcon from "@mui/icons-material/Close";
-import ModalCadastro from "../ModalCadastro/ModalCadastro";
-import ModalInformacoes from "../ModalInformacoes/ModalInformacoes";
+import InputMask from "react-input-mask";
+import { useSearch } from '../../services/SearchContext';
 import S from "./Pesquisa.module.css";
 
-function PesquisaComLupa() {
-  const [pesquisa, setPesquisa] = useState("");
-  const [tipoPesquisa, setTipoPesquisa] = useState("");
-  const [response, setResponse] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [searchPerformed, setSearchPerformed] = useState(false);
-  const [openCadastro, setOpenCadastro] = useState(false);
-  const [openInfo, setOpenInfo] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+const setores = [
+  "Brava",
+  "Comercial",
+  "CRF",
+  "DaVita",
+  "Droom",
+  "Financeiro",
+  "Operações",
+  "Planejamento",
+  "Qualidade",
+  "RH",
+  "TI",
+];
 
-  const fetchDados = async () => {
-    try {
-      const res = await fetch("http://192.168.5.32:5108/api/cadastro");
-      if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
-      const data = await res.json();
-      setResponse(data.dados);
-      setFilteredProducts(data.dados);
-    } catch (err) {
-      console.error("Erro ao buscar dados:", err);
-    }
+function PesquisaComLupa() {
+  const [periodo, setPeriodo] = useState([null, null]);
+  const [erroCamposVazios, setErroCamposVazios] = useState(false);
+  const [filtros, setFiltros] = useState({
+    setor: "",
+    usuario: "",
+    tag: "",
+    dataDeEntrada: "",
+    dataDeSaida: "",
+  });
+  const { searchByFilters } = useSearch();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFiltros((prev) => ({ ...prev, [name]: value }));
   };
 
-  useEffect(() => {
-    fetchDados();
-  }, []);
-
   const handleSearchClick = () => {
-    if (!tipoPesquisa) {
-      alert("Selecione um tipo de busca!");
+    const todosVazios = Object.values(filtros).every(
+      (valor) => valor.trim() === "" && !periodo[0] && !periodo[1]
+    );
+
+    if (todosVazios) {
+      setErroCamposVazios(true);
       return;
     }
 
@@ -93,137 +102,125 @@ switch (tipoPesquisa) {
     setSearchPerformed(true);
   };
 
+
   const handleClearSearch = () => {
-    setPesquisa("");
-    setFilteredProducts(response);
-    setSearchPerformed(false);
+    const filtrosVazios = {
+      setor: "",
+      usuario: "",
+      tag: "",
+      dataDeEntrada: "",
+      dataDeSaida: "",
+    };
+
+    setFiltros(filtrosVazios);
+    setPeriodo([null, null]);
+    setErroCamposVazios(false);
+
+    // Chama a MESMA função searchByFilters, não searchByFiltersAgain
+    searchByFilters(filtrosVazios);
   };
 
   return (
     <main className={S.pesquisa}>
-      <div className={S.label}>
-        <FormControl sx={{ marginRight: 4, minWidth: 180 }}>
-          <InputLabel id="select-tipo-label">Buscar por</InputLabel>
-          <Select
-            labelId="select-tipo-label"
-            value={tipoPesquisa}
-            onChange={(e) => setTipoPesquisa(e.target.value)}
-            label="Buscar por"
-          >
-            <MenuItem value="">
-              <em>Selecione</em>
-            </MenuItem>
-            <MenuItem value="Setor">Setor</MenuItem>
-            <MenuItem value="Tag">Tag</MenuItem>
-            <MenuItem value="Usuário">Usuário</MenuItem>
-          </Select>
-        </FormControl>
+      <Box className={S.label} display="flex" gap={2} flexWrap="wrap" alignItems="center">
+        <Accordion>
+          <AccordionSummary expandIcon={<ArrowDropDownIcon />}>
+            <Box display="flex" alignItems="center">
+              <SearchIcon sx={{ marginRight: 1 }} />
+              <Typography component="span">Filtros</Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Box display="flex" flexDirection="column" gap={2}>
+              <Box display="flex" justifyContent="space-between" flexWrap="wrap" gap={2}>
+                <InputMask mask="999999" value={filtros.tag} onChange={handleInputChange}>
+                  {(inputProps) => (
+                    <TextField
+                      {...inputProps}
+                      name="tag"
+                      label="Tag"
+                      sx={{ flex: 1, minWidth: "150px" }}
+                      error={erroCamposVazios && filtros.tag.trim() === ""}
+                      helperText={erroCamposVazios && filtros.tag.trim() === "" ? "Campo obrigatório" : ""}
+                    />
+                  )}
+                </InputMask>
 
-        <TextField
-          label="Pesquisar"
-          variant="outlined"
-          fullWidth
-          value={pesquisa}
-          onChange={(e) => setPesquisa(e.target.value)}
-          sx={{ width: "40em" }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                {pesquisa && (
-                  <IconButton onClick={handleClearSearch}>
-                    <CloseIcon />
-                  </IconButton>
-                )}
-                <IconButton onClick={handleSearchClick}>
-                  <SearchIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        <Stack direction="row" spacing={2}>
-          <Button
-            variant="outlined"
-            startIcon={<CreateNewFolderIcon />}
-            onClick={() => setOpenCadastro(true)}
-            sx={{
-              height: "4em",
-              background:
-                "linear-gradient(to bottom, #eab71b, rgb(234, 137, 27))",
-              color: "#fff",
-              border: "solid 1px #fff",
-            }}
-          >
-            Adicionar Equipamento
-          </Button>
-        </Stack>
-      </div>
-
-      <div className={S.resultados}>
-        {searchPerformed && filteredProducts.length > 0 && (
-          <Box>
-            <Typography variant="h6" sx={{ marginBottom: 2, textAlign: 'center' }}>
-              Resultados encontrados:
-            </Typography>
-            <Grid2
-              container
-              spacing={2}
-              display="flex"
-              justifyContent="space-around" // centraliza os cards
-              alignItems="center"
-            >
-              {filteredProducts.map((item, index) => (
-                <Grid2 item xs={12} sm={6} md={3} key={item._id || index}>
-                  <Card
-                    sx={{
-                      width: 300,
-                      height: 200,
-                      backgroundColor: "#203e77",
-                      color: "#ffffff",
-                    }}
+                <FormControl sx={{ flex: 1, minWidth: "150px" }} error={erroCamposVazios && filtros.setor === ""}>
+                  <InputLabel id="label-setor">Setor</InputLabel>
+                  <Select
+                    labelId="label-setor"
+                    name="setor"
+                    value={filtros.setor}
+                    onChange={handleInputChange}
+                    label="Setor"
                   >
-                    <CardContent>
-                      <Typography variant="h6">{`Usuário: ${item.usuario}`}</Typography>
-                      <Typography>{`Setor: ${item.setor}`}</Typography>
-                      <Typography>{`Tag: ${item.tag}`}</Typography>
-                      <Typography>{`Tipo: ${item.tipo}`}</Typography>
-                      <Typography>{`Data de Entrada: ${new Date(
-                        item.dataDeEntrada
-                      ).toLocaleDateString()}`}</Typography>
-                      <Typography>{`Ativo: ${
-                        item.ativo ? "Sim" : "Não"
-                      }`}</Typography>
-                      {item.dataDeSaida && (
-                        <Typography>{`Data de Saída: ${new Date(
-                          item.dataDeSaida
-                        ).toLocaleDateString()}`}</Typography>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Grid2>
-              ))}
-            </Grid2>
-          </Box>
-        )}
+                    {setores.map((setor) => (
+                      <MenuItem key={setor} value={setor}>
+                        {setor}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {erroCamposVazios && filtros.setor === "" && <Typography color="error">Campo obrigatório</Typography>}
+                </FormControl>
 
-        {searchPerformed && filteredProducts.length === 0 && (
-          <Typography variant="body1" color="error">
-            Nenhum resultado encontrado.
-          </Typography>
-        )}
-      </div>
+                <TextField
+                  name="usuario"
+                  label="Usuário"
+                  value={filtros.usuario}
+                  onChange={handleInputChange}
+                  sx={{ flex: 1, minWidth: "150px" }}
+                  error={erroCamposVazios && filtros.usuario.trim() === ""}
+                  helperText={erroCamposVazios && filtros.usuario.trim() === "" ? "Campo obrigatório" : ""}
+                />
 
-      <ModalCadastro
-        open={openCadastro}
-        onClose={() => setOpenCadastro(false)}
-        fetchDados={fetchDados}
-      />
-      <ModalInformacoes
-        open={openInfo}
-        onClose={() => setOpenInfo(false)}
-        item={selectedItem}
-      />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Box display="flex" gap={2} flexWrap="wrap">
+                    <DatePicker
+                      label="Data inicial"
+                      value={periodo[0]}
+                      onChange={(newValue) => setPeriodo([newValue, periodo[1]])}
+                    />
+                    <DatePicker
+                      label="Data final"
+                      value={periodo[1]}
+                      onChange={(newValue) => setPeriodo([periodo[0], newValue])}
+                    />
+                  </Box>
+                </LocalizationProvider>
+              </Box>
+
+              <Box display="flex" justifyContent="flex-end" gap={2}>
+                <Button
+                  variant="contained"
+                  startIcon={<SearchIcon />}
+                  onClick={handleSearchClick}
+                  sx={{
+                    background: "linear-gradient(to bottom, #eab71b, rgb(234, 137, 27))",
+                    color: "#fff",
+                    border: "solid 1px #fff",
+                  }}
+                >
+                  Filtrar
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  startIcon={<CloseIcon />}
+                  onClick={handleClearSearch}
+                  sx={{
+                    background: "linear-gradient(to bottom, #eab71b, rgb(234, 137, 27))",
+                    color: "#fff",
+                    border: "solid 1px #fff",
+                  }}
+                >
+                  Limpar
+                </Button>
+              </Box>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
+      </Box>
     </main>
   );
 }

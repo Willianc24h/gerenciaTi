@@ -10,22 +10,24 @@ import NovoUsuario from './Pages/NovoUsuario/NovoUsuario'
 
 function App() {
   return (
-    <BrowserRouter>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <Header />
-        <main style={{ flex: 1 }}>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/computadores" element={<Cadastramento />} />
-            <Route path="/usuario" element={<NovoUsuario/>}/>
-            {/* <Route path="/perifericos" element={<Perifericos />} /> */}
-            {/* <Route path="/tarefas" element={<Tarefas />} /> */}
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </BrowserRouter>
-  )
+    <SearchProvider> {/* Envolvendo a aplicação com o SearchProvider */}
+      <BrowserRouter>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <Header />
+          <main style={{ flex: 1 }}>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/computadores" element={<Cadastramento />} />
+              <Route path="/usuario" element={<NovoUsuario />} />
+              {/* <Route path="/perifericos" element={<Perifericos />} /> */}
+              {/* <Route path="/tarefas" element={<Tarefas />} /> */}
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </BrowserRouter>
+    </SearchProvider>
+  );
 }
 
-export default App
+export default App;
