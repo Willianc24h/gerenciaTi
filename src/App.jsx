@@ -1,11 +1,12 @@
-import Footer from './Components/Footer/Footer'
-import Header from './Components/Header/Header'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Login from './Pages/Login/Login'
-import Cadastramento from './Pages/Cadastramento/Cadastramento'
-//import Perifericos from './Pages/Perifericos/Perifericos'
-import Tarefas from './Pages/Tarefas/Tarefas'
-import NovoUsuario from './Pages/NovoUsuario/NovoUsuario'
+import Footer from './Components/Footer/Footer';
+import Header from './Components/Header/Header';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Login from './Pages/Login/Login';
+import Cadastramento from './Pages/Cadastramento/Cadastramento';
+import Perifericos from './Pages/Perifericos/Perifericos';
+import Tarefas from './Pages/Tarefas/Tarefas';
+import NovoUsuario from './Pages/NovoUsuario/NovoUsuario';
+import { SearchProvider } from '../src/services/SearchContext';
 
 
 function App() {
