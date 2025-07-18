@@ -10,7 +10,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IMaskInput } from "react-imask";
 
 const setores = [
@@ -28,6 +28,7 @@ const setores = [
 ];
 const tipos = ["Desktop", "Monitor", "Notebook"];
 const usuarios = ["Operador", "Supervisor", "Backoffice", "Qualidade", "Outro"];
+const SistemaOperacional = ["Windows 10", "Windows 11", "Linux", "MacOS"];
 
 // Componente máscara de data
 const DateMask = React.forwardRef((props, ref) => {
@@ -49,6 +50,21 @@ const DateMask = React.forwardRef((props, ref) => {
   );
 });
 DateMask.displayName = "DateMask";
+
+// Componente máscara para o campo Tag
+const TagMask = React.forwardRef((props, ref) => {
+  const { onChange, ...other } = props;
+  return (
+    <IMaskInput
+      {...other}
+      mask="000000" // Máscara para 6 dígitos
+      inputRef={ref}
+      onAccept={(value) => onChange({ target: { name: props.name, value } })}
+      overwrite
+    />
+  );
+});
+TagMask.displayName = "TagMask";
 
 const convertToAPIFormat = (dateString) => {
   if (!dateString) return null;
@@ -72,7 +88,15 @@ function TextInput({ name, label, value, onChange, required, sx, InputProps }) {
 }
 
 // Componente genérico SelectField
-function SelectField({ name, label, value, onChange, options, sx, displayEmpty = true }) {
+function SelectField({
+  name,
+  label,
+  value,
+  onChange,
+  options,
+  sx,
+  displayEmpty = true,
+}) {
   return (
     <Select
       name={name}
@@ -127,7 +151,9 @@ function ModalCadastro({ open, onClose, fetchDados }) {
     Usuario: "",
     outroUsuario: "",
     NFE: "",
-    Ativo: false,
+    Ativo: true,
+    SistemaOperacional: "",
+    Geracao: "",
   });
 
   const [successModalOpen, setSuccessModalOpen] = useState(false);
@@ -152,7 +178,7 @@ function ModalCadastro({ open, onClose, fetchDados }) {
     e.preventDefault();
     setIsLoading(true);
 
-    const url = "http://192.168.5.32:5108/api/cadastro";
+    const url = "http://localhost:5108/api/cadastro";
 
     const dataDeEntradaFormatada = convertToAPIFormat(formData.dataDeEntrada);
     const dataDeSaidaFormatada = convertToAPIFormat(formData.dataDeSaida);
@@ -164,10 +190,18 @@ function ModalCadastro({ open, onClose, fetchDados }) {
       dataDeSaida: dataDeSaidaFormatada,
       Tipo: formData.Tipo,
       Usuario: formData.Usuario,
-      outroUsuario: formData.Usuario === "Outro" ? formData.outroUsuario : undefined,
+      outroUsuario:
+        formData.Usuario === "Outro" ? formData.outroUsuario : undefined,
       NFE: formData.NFE,
       Ativo: formData.Ativo,
+      SistemaOperacional: formData.SistemaOperacional,
+      Geracao: formData.Geracao,
     };
+      // Validação do campo Tag
+  if (formData.Tag.trim() === "") {
+    setTagTouched(true); // Mostra o erro se estiver vazio
+    return; // Impede o envio do formulário
+  }
 
     try {
       const res = await fetch(url, {
@@ -192,23 +226,37 @@ function ModalCadastro({ open, onClose, fetchDados }) {
         outroUsuario: "",
         NFE: "",
         Ativo: true,
+        SistemaOperacional: "",
+        Geracao: "",
       });
-      onClose();
+
+      // Não chamamos fetchDados aqui, pois vamos recarregar a página após o modal
+      // fetchDados();
+      // onClose();
     } catch (err) {
       console.error("Erro completo:", err);
       alert(err.message);
     } finally {
-      fetchDados();
       setIsLoading(false);
     }
   };
+
+  const handleSuccessModalClose = () => {
+    setSuccessModalOpen(false);
+    fetchDados(); // Atualiza os dados após fechar o modal
+    onClose(); // Fecha o modal de cadastro
+    window.location.reload(); // Recarrega a página
+  };
+
+  const [tagTouched, setTagTouched] = useState(false);
+  // Verifica se o campo Tag está vazio para mostrar o erro
+  const tagError = tagTouched && formData.Tag.trim() === "";
 
   return (
     <>
       <Modal open={open} onClose={onClose}>
         <Box
           component="form"
-          onSubmit={handleSubmit}
           sx={{
             position: "absolute",
             top: "50%",
@@ -230,12 +278,15 @@ function ModalCadastro({ open, onClose, fetchDados }) {
             label="Tag"
             value={formData.Tag}
             onChange={handleInputChange}
+            onBlur={() => setTagTouched(true)} // Marca como "tocado" quando o campo perde o foco
             required
+            InputProps={{ inputComponent: TagMask }}
+            error={tagError} // Destaca o campo em vermelho se estiver vazio
+            helperText={tagError ? "Campo obrigatório" : ""} // Mensagem de erro
           />
-
           <SelectField
             name="Setor"
-            label="Selecione um setor"
+            label="Selecione um setor/produto"
             value={formData.Setor}
             onChange={handleInputChange}
             options={setores}
@@ -247,14 +298,6 @@ function ModalCadastro({ open, onClose, fetchDados }) {
             value={formData.dataDeEntrada}
             onChange={handleInputChange}
             required
-            InputProps={{ inputComponent: DateMask }}
-          />
-
-          <TextInput
-            name="dataDeSaida"
-            label="Data de Saída"
-            value={formData.dataDeSaida}
-            onChange={handleInputChange}
             InputProps={{ inputComponent: DateMask }}
           />
 
@@ -272,6 +315,21 @@ function ModalCadastro({ open, onClose, fetchDados }) {
             value={formData.Tipo}
             onChange={handleInputChange}
             options={tipos}
+          />
+
+          <SelectField
+            name="SistemaOperacional"
+            label="Selecione um Sistema Operacional"
+            value={formData.SistemaOperacional}
+            onChange={handleInputChange}
+            options={SistemaOperacional}
+          />
+          <TextInput
+            name="Geracao"
+            label="Geração"
+            value={formData.Geracao}
+            onChange={handleInputChange}
+            required
           />
 
           <TextInput
@@ -294,15 +352,47 @@ function ModalCadastro({ open, onClose, fetchDados }) {
               type="submit"
               variant="contained"
               disabled={isLoading}
-              onClick={handleSubmit}
               sx={{
                 background:
                   "linear-gradient(to bottom,rgb(248, 179, 88),rgb(252, 203, 69))",
               }}
+              onClick={handleSubmit} // Chama a função de submit
             >
               Salvar
             </Button>
           </Stack>
+        </Box>
+      </Modal>
+
+      {/* Modal de sucesso */}
+      <Modal open={successModalOpen} onClose={() => setSuccessModalOpen(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "20em",
+            p: 4,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            borderRadius: "10px",
+            textAlign: "center",
+          }}
+        >
+          <Typography variant="h6" mb={2}>
+            Cadastro concluído com sucesso!
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={handleSuccessModalClose}
+            sx={{
+              background:
+                "linear-gradient(to bottom,rgb(248, 179, 88),rgb(252, 203, 69))",
+            }}
+          >
+            OK
+          </Button>
         </Box>
       </Modal>
     </>

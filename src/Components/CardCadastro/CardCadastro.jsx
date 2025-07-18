@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -18,17 +18,21 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import ModalCadastro from "../ModalCadastro/ModalCadastro";
+import ModalInformacoes from "../ModalInformacoes/ModalInformacoes"; // Importando o modal de informações
+import { useSearch } from "../../services/SearchContext"; // Importando o contexto
 
 export default function BasicCard() {
-  const [data, setData] = useState([]);
+  const { searchResults, loading, error, fetchData } = useSearch(); // Usando o contexto
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [inactivateModalOpen, setInactivateModalOpen] = useState(false);
+  const [infoModalOpen, setInfoModalOpen] = useState(false); // Estado para o modal de informações
   const [selectedItem, setSelectedItem] = useState(null);
   const [activeCount, setActiveCount] = useState(0);
   const [inactiveCount, setInactiveCount] = useState(0);
-  const [refresh, setRefresh] = useState(false);
   const [itemsToShow, setItemsToShow] = useState(10);
+  const [openCadastro, setOpenCadastro] = useState(false);
 
   const setores = [
     "Brava",
@@ -44,6 +48,7 @@ export default function BasicCard() {
   ];
 
   const tipos = ["Desktop", "Monitor", "Notebook"];
+
   // Modal style
   const style = {
     position: "absolute",
@@ -59,56 +64,7 @@ export default function BasicCard() {
     fontSize: "1rem",
   };
 
-  // Fetch data from API
-  const fetchData = async () => {
-    const url = `http://192.168.5.32:5108/api/cadastro`;
-    let response;
-
-    try {
-      response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error(`Erro HTTP: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (Array.isArray(result.dados)) {
-        const mappedData = result.dados.map((item) => ({
-          Tag: item.tag,
-          setor: item.setor,
-          dataDeEntrada: item.dataDeEntrada,
-          dataDeSaida: item.dataDeSaida,
-          usuario: item.usuario,
-          tipo: item.tipo,
-          nfe: item.nfe,
-          ativo: item.ativo,
-        }));
-
-        setData(mappedData);
-        countActiveAndInactive(mappedData);
-      } else {
-        throw new Error("Formato de dados inválido");
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dados:", error.message);
-
-      if (response) {
-        try {
-          const text = await response.text();
-          console.log("Texto da resposta bruta:", text);
-        } catch {
-          console.log("Não foi possível ler o conteúdo da resposta.");
-        }
-      } else {
-        console.log(
-          "A resposta não foi recebida. Verifique se a API está online."
-        );
-      }
-    }
-  };
-
-  // Count active and inactive machines
+  // Contar máquinas ativas e inativas
   const countActiveAndInactive = (data) => {
     const active = data.filter((item) => item.ativo).length;
     const inactive = data.filter((item) => !item.ativo).length;
@@ -116,19 +72,21 @@ export default function BasicCard() {
     setInactiveCount(inactive);
   };
 
-  React.useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => {
+    if (searchResults.length > 0) {
+      countActiveAndInactive(searchResults);
+    }
+  }, [searchResults]);
 
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `http://192.168.5.32:5108/api/cadastro/${selectedItem.Tag}`,
+        `http://localhost:5108/api/cadastro/${selectedItem.tag}`,
         { method: "DELETE" }
       );
 
       if (response.ok) {
-        console.log(`Item com Tag: ${selectedItem.Tag} excluído com sucesso.`);
+        console.log(`Item com tag: ${selectedItem.tag} excluído com sucesso.`);
         fetchData(); // Atualiza os dados após exclusão
       } else {
         throw new Error("Erro ao excluir item");
@@ -143,7 +101,6 @@ export default function BasicCard() {
   const handleEdit = (item) => {
     setSelectedItem(item);
     setEditModalOpen(true);
-    console.log(item);
   };
 
   const handleOpenDeleteModal = (item) => {
@@ -151,9 +108,9 @@ export default function BasicCard() {
     setDeleteModalOpen(true);
   };
 
-  const handleOpenInactivateModal = (item) => {
+  const handleOpenInfoModal = (item) => {
     setSelectedItem(item);
-    setInactivateModalOpen(true);
+    setInfoModalOpen(true); // Abre o modal de informações
   };
 
   const handleSave = async () => {
@@ -161,7 +118,7 @@ export default function BasicCard() {
 
     const updatedItem = { ...selectedItem };
 
-    const url = `http://192.168.5.32:5108/api/cadastro/${updatedItem.Tag}`;
+    const url = `http://localhost:5108/api/cadastro/${updatedItem.tag}`;
     try {
       const response = await fetch(url, {
         method: "PUT",
@@ -171,13 +128,7 @@ export default function BasicCard() {
 
       if (!response.ok) throw new Error("Erro ao atualizar item");
 
-      setData((prevData) =>
-        prevData.map((item) =>
-          item.Tag === updatedItem.Tag ? updatedItem : item
-        )
-      );
-
-      setRefresh((prev) => !prev); // Altera o estado para forçar re-renderização
+      fetchData(); // Atualiza os dados após edição
       setEditModalOpen(false);
     } catch (error) {
       console.error("Erro ao salvar edição:", error);
@@ -185,39 +136,7 @@ export default function BasicCard() {
   };
 
   const handleLoadMore = () => {
-    setItemsToShow((prev) => prev + 10); // Incrementa 8 itens a cada clique
-  };
-
-  const inativarCadastro = async () => {
-    if (!selectedItem || !selectedItem.Tag) {
-      console.error("Erro: Tag não fornecida para inativar.");
-      setInactivateModalOpen(false); // Fecha o modal caso haja erro
-      return;
-    }
-
-    const url = `http://192.168.5.32:5108/api/cadastro/inativa/${selectedItem.Tag}`;
-    try {
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ Ativo: false }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erro ao inativar cadastro: ${response.status}`);
-      }
-
-      console.log(
-        `Cadastro com Tag: ${selectedItem.Tag} inativado com sucesso.`
-      );
-      fetchData(); // Atualiza os dados após inativar
-    } catch (error) {
-      console.error("Erro ao inativar cadastro:", error);
-    } finally {
-      setInactivateModalOpen(false); // Fecha o modal
-    }
+    setItemsToShow((prev) => prev + 10); // Incrementa 10 itens a cada clique
   };
 
   return (
@@ -232,43 +151,80 @@ export default function BasicCard() {
         boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
       }}
     >
-      <Stack direction="row" spacing={1}>
-        <Chip
-          label={`${activeCount} Ativos`}
+      <ModalCadastro
+        open={openCadastro}
+        onClose={() => setOpenCadastro(false)}
+        fetchDados={fetchData}
+      />
+
+      <ModalInformacoes
+        open={infoModalOpen}
+        onClose={() => setInfoModalOpen(false)}
+        item={selectedItem}
+      />
+
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        <Stack direction="row" spacing={1}>
+          <Chip
+            label={`${activeCount} Ativos`}
+            variant="outlined"
+            sx={{
+              backgroundColor: "#63d663",
+              fontFamily: "Roboto",
+              fontSize: "1rem",
+              fontWeight: "bold",
+              color: "#fff",
+              width: "7em",
+              height: "2.25em",
+            }}
+          />
+          <Chip
+            label={`${inactiveCount} Inativos`}
+            variant="outlined"
+            sx={{
+              backgroundColor: "#eb6a59",
+              fontFamily: "Roboto",
+              fontSize: "1rem",
+              fontWeight: "bold",
+              color: "#fff",
+              width: "7em",
+              height: "2.25em",
+            }}
+          />
+        </Stack>
+
+        <Button
           variant="outlined"
+          startIcon={<CreateNewFolderIcon />}
+          onClick={() => setOpenCadastro(true)}
           sx={{
-            backgroundColor: "#63d663",
-            fontFamily: "Roboto",
-            fontSize: "1rem",
-            fontWeight: "bold",
+            background:
+              "linear-gradient(to bottom, #eab71b, rgb(234, 137, 27))",
             color: "#fff",
-            width: "7em",
+            border: "solid 1px #fff",
+            margin: "1em 0",
             height: "2.25em",
-            margin: "1em",
           }}
-        />
-        <Chip
-          label={`${inactiveCount} Inativos`}
-          variant="outlined"
-          sx={{
-            backgroundColor: "#eb6a59",
-            fontFamily: "Roboto",
-            fontSize: "1rem",
-            fontWeight: "bold",
-            color: "#fff",
-            width: "7em",
-            height: "2.25em",
-            margin: "1em",
-          }}
-        />
-      </Stack>
+        >
+          Adicionar Equipamento
+        </Button>
+      </Box>
+
       <br />
       <br />
       <br />
       <Grid2 container spacing={2} justifyContent="space-between">
-        {data.length > 0 ? (
-          data.slice(0, itemsToShow).map((item, index) => (
-            <Grid2 item xs={12} sm={9} md={6} lg={3} key={index}>
+        {searchResults.length > 0 ? (
+          searchResults.slice(0, itemsToShow).map((item, index) => (
+            <Grid2 xs={12} sm={9} md={6} lg={3} key={index}>
               <Card sx={{ Width: 400 }}>
                 <CardContent
                   sx={{
@@ -285,10 +241,12 @@ export default function BasicCard() {
                       fontFamily: "roboto",
                       color: "#6b6868",
                       margin: 0,
+                      cursor: "pointer", // Adicionando o cursor pointer
                     }}
                     component="div"
+                    onClick={() => handleOpenInfoModal(item)} // Adicionando o clique na tag
                   >
-                    {item.Tag}
+                    {item.tag}
                   </Typography>
                   <Typography
                     variant="h6"
@@ -346,7 +304,7 @@ export default function BasicCard() {
       </Grid2>
       <br />
       <br />
-      {itemsToShow < data.length && (
+      {itemsToShow < searchResults.length && (
         <Box
           sx={{
             display: "flex",
@@ -368,6 +326,7 @@ export default function BasicCard() {
           </Button>
         </Box>
       )}
+
       {/* Modal for editing */}
       <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)}>
         <Box sx={style}>
@@ -385,14 +344,14 @@ export default function BasicCard() {
           {selectedItem && (
             <>
               <TextField
-                label="Tag"
+                label="tag"
                 fullWidth
                 margin="normal"
-                value={selectedItem.Tag || ""}
+                value={selectedItem.tag || ""}
                 onChange={(e) => {
                   setSelectedItem({
                     ...selectedItem,
-                    Tag: e.target.value,
+                    tag: e.target.value,
                   });
                 }}
                 InputLabelProps={{
@@ -486,9 +445,7 @@ export default function BasicCard() {
               <Button
                 variant="contained"
                 color="secondary"
-                onClick={() => {
-                  handleSave();
-                }}
+                onClick={handleSave}
                 sx={{
                   mt: 2,
                   fontFamily: "Roboto",
@@ -527,16 +484,16 @@ export default function BasicCard() {
             gutterBottom
             sx={{ fontFamily: "Roboto" }}
           >
-            Confirmar exclusão
+            Confirmar Inativação
           </Typography>
           <Typography sx={{ fontFamily: "Roboto" }}>
-            Deseja realmente excluir o item com Tag:{" "}
-            <strong>{selectedItem?.Tag}</strong>?
+            Deseja realmente inativar o item com tag:{" "}
+            <strong>{selectedItem?.tag}</strong>?
           </Typography>
           <Box sx={{ mt: 3, display: "flex", justifyContent: "space-around" }}>
             <Button
               variant="contained"
-              onClick={handleDelete}
+              onClick={handleSave}
               sx={{ backgroundColor: "#203e77" }}
             >
               Confirmar
