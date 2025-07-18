@@ -63,8 +63,43 @@ function PesquisaComLupa() {
       return;
     }
 
-    setErroCamposVazios(false);
-    searchByFilters({ ...filtros, periodo });
+    if (pesquisa.trim() === "") {
+      alert(`Digite um ${tipoPesquisa.toLowerCase()} para pesquisar!`);
+      return;
+    }
+
+    const pesquisaNormalizada = pesquisa.trim().toLowerCase();
+    let resultados = [];
+switch (tipoPesquisa) {
+      case "Setor":
+        resultados = response.filter(
+          (item) =>
+            item.setor && item.setor.toLowerCase() === pesquisaNormalizada
+        );
+        break;
+      case "Usuário":
+        resultados = response.filter(
+          (item) =>
+            item.usuario &&
+            item.usuario.toLowerCase().includes(pesquisaNormalizada)
+        );
+        break;
+      case "Tag":
+        const resultado = response.find(
+          (item) => item.tag && item.tag.toLowerCase() === pesquisaNormalizada
+        );
+        if (resultado) {
+          setSelectedItem(resultado);
+          setOpenInfo(true);
+          return;
+        }
+        break;
+      default:
+        break;
+    }
+
+    setFilteredProducts(resultados);
+    setSearchPerformed(true);
   };
 
 
