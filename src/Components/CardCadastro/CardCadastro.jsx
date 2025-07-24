@@ -20,6 +20,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import ModalCadastro from "../ModalCadastro/ModalCadastro";
+import InputMask from "react-input-mask";
 import ModalInformacoes from "../ModalInformacoes/ModalInformacoes"; // Importando o modal de informações
 import { useSearch } from "../../services/SearchContext"; // Importando o contexto
 
@@ -78,7 +79,14 @@ export default function BasicCard() {
     }
   }, [searchResults]);
 
-  const handleDelete = async () => {
+  const handleInative = async () => {
+    if (!selectedItem.dataDeSaida) {
+      alert(
+        "É necessário preencher o campo Data de Saída para inativar o equipamento."
+      );
+      return;
+    }
+
     try {
       const response = await fetch(
         `http://192.168.5.32:5108/api/cadastro/inativa/${selectedItem.tag}`,
@@ -301,7 +309,7 @@ export default function BasicCard() {
             </Grid2>
           ))
         ) : (
-          <Typography variant="h6">Nenhum dado encontrado.</Typography>
+          <Typography variant="h5">Nenhum dado encontrado.</Typography>
         )}
       </Grid2>
       <br />
@@ -380,27 +388,35 @@ export default function BasicCard() {
                   ))}
                 </Select>
               </FormControl>
-              <TextField
-                label="Data de Saída"
-                fullWidth
-                margin="normal"
-                type="date"
+              <InputMask
+                mask="99/99/9999"
                 value={selectedItem.dataDeSaida || ""}
-                onChange={(e) => {
+                onChange={(e) =>
                   setSelectedItem({
                     ...selectedItem,
                     dataDeSaida: e.target.value,
-                  });
-                }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
+                  })
+                }
+              >
+                {(inputProps) => (
+                  <TextField
+                    {...inputProps}
+                    label="Data de Saída"
+                    fullWidth
+                    margin="normal"
+                    placeholder="dd/mm/aaaa"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                )}
+              </InputMask>
               <FormControl fullWidth margin="normal">
                 <InputLabel>Tipo</InputLabel>
                 <Select
                   value={selectedItem.tipo || ""}
                   label="Tipo"
+                  disabled
                   onChange={(e) => {
                     setSelectedItem({
                       ...selectedItem,
@@ -495,7 +511,7 @@ export default function BasicCard() {
           <Box sx={{ mt: 3, display: "flex", justifyContent: "space-around" }}>
             <Button
               variant="contained"
-              onClick={handleDelete}
+              onClick={handleInative}
               sx={{ backgroundColor: "#203e77" }}
             >
               Confirmar
