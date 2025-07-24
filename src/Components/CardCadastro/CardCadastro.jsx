@@ -81,20 +81,22 @@ export default function BasicCard() {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5108/api/cadastro/${selectedItem.tag}`,
-        { method: "DELETE" }
+        `http://192.168.5.32:5108/api/cadastro/inativa/${selectedItem.tag}`,
+        {
+          method: "PUT",
+        }
       );
 
       if (response.ok) {
-        console.log(`Item com tag: ${selectedItem.tag} excluído com sucesso.`);
-        fetchData(); // Atualiza os dados após exclusão
+        console.log(`Item com tag: ${selectedItem.tag} inativado com sucesso.`);
+        fetchData(); // Atualiza os dados após inativação
       } else {
-        throw new Error("Erro ao excluir item");
+        throw new Error("Erro ao inativar item");
       }
     } catch (error) {
-      console.error("Erro ao excluir:", error);
+      console.error("Erro ao inativar:", error);
     } finally {
-      setDeleteModalOpen(false); // Fecha o modal após a tentativa de exclusão
+      setDeleteModalOpen(false); // Fecha o modal após a tentativa
     }
   };
 
@@ -118,7 +120,7 @@ export default function BasicCard() {
 
     const updatedItem = { ...selectedItem };
 
-    const url = `http://localhost:5108/api/cadastro/${updatedItem.tag}`;
+    const url = `http://192.168.5.32:5108/api/cadastro/${updatedItem.tag}`;
     try {
       const response = await fetch(url, {
         method: "PUT",
@@ -493,7 +495,7 @@ export default function BasicCard() {
           <Box sx={{ mt: 3, display: "flex", justifyContent: "space-around" }}>
             <Button
               variant="contained"
-              onClick={handleSave}
+              onClick={handleDelete}
               sx={{ backgroundColor: "#203e77" }}
             >
               Confirmar

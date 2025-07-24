@@ -28,7 +28,7 @@ const setores = [
 ];
 const tipos = ["Desktop", "Monitor", "Notebook"];
 const usuarios = ["Operador", "Supervisor", "Backoffice", "Qualidade", "Outro"];
-const SistemaOperacional = ["Windows 10", "Windows 11", "Linux", "MacOS"];
+const SistemaOperacional = ["Não se aplica","Windows 10", "Windows 11", "Linux", "MacOS"];
 
 // Componente máscara de data
 const DateMask = React.forwardRef((props, ref) => {
@@ -178,7 +178,7 @@ function ModalCadastro({ open, onClose, fetchDados }) {
     e.preventDefault();
     setIsLoading(true);
 
-    const url = "http://localhost:5108/api/cadastro";
+    const url = "http://192.168.5.32:5108/api/cadastro/";
 
     const dataDeEntradaFormatada = convertToAPIFormat(formData.dataDeEntrada);
     const dataDeSaidaFormatada = convertToAPIFormat(formData.dataDeSaida);

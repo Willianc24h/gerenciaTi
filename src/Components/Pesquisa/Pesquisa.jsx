@@ -47,13 +47,12 @@ function PesquisaComLupa() {
     dataDeSaida: "",
   });
   const { searchByFilters } = useSearch();
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFiltros((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSearchClick = () => {
+const handleSearchClick = () => {
     const todosVazios = Object.values(filtros).every(
       (valor) => valor.trim() === "" && !periodo[0] && !periodo[1]
     );
@@ -63,43 +62,8 @@ function PesquisaComLupa() {
       return;
     }
 
-    if (pesquisa.trim() === "") {
-      alert(`Digite um ${tipoPesquisa.toLowerCase()} para pesquisar!`);
-      return;
-    }
-
-    const pesquisaNormalizada = pesquisa.trim().toLowerCase();
-    let resultados = [];
-switch (tipoPesquisa) {
-      case "Setor":
-        resultados = response.filter(
-          (item) =>
-            item.setor && item.setor.toLowerCase() === pesquisaNormalizada
-        );
-        break;
-      case "Usuário":
-        resultados = response.filter(
-          (item) =>
-            item.usuario &&
-            item.usuario.toLowerCase().includes(pesquisaNormalizada)
-        );
-        break;
-      case "Tag":
-        const resultado = response.find(
-          (item) => item.tag && item.tag.toLowerCase() === pesquisaNormalizada
-        );
-        if (resultado) {
-          setSelectedItem(resultado);
-          setOpenInfo(true);
-          return;
-        }
-        break;
-      default:
-        break;
-    }
-
-    setFilteredProducts(resultados);
-    setSearchPerformed(true);
+    setErroCamposVazios(false);
+    searchByFilters({ ...filtros, periodo });
   };
 
 
@@ -179,11 +143,13 @@ switch (tipoPesquisa) {
                     <DatePicker
                       label="Data inicial"
                       value={periodo[0]}
+                      format="DD/MM/YYYY"
                       onChange={(newValue) => setPeriodo([newValue, periodo[1]])}
                     />
                     <DatePicker
                       label="Data final"
                       value={periodo[1]}
+                      format="DD/MM/YYYY"
                       onChange={(newValue) => setPeriodo([periodo[0], newValue])}
                     />
                   </Box>
