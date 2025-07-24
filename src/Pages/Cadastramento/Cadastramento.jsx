@@ -1,3 +1,4 @@
+import React from 'react'
 import PesquisaComLupa from '../../Components/Pesquisa/Pesquisa';
 import BasicCard from '../../Components/CardCadastro/CardCadastro';
 

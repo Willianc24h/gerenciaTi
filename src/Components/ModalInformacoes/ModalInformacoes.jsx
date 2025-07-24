@@ -1,3 +1,4 @@
+import React from 'react'
 import { Box, Typography, Button, Modal } from "@mui/material";
 
 function ModalInformacoes({ open, onClose, item }) {
