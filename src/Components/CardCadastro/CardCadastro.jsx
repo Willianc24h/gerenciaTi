@@ -390,13 +390,29 @@ export default function BasicCard() {
               </FormControl>
               <InputMask
                 mask="99/99/9999"
-                value={selectedItem.dataDeSaida || ""}
-                onChange={(e) =>
+                value={selectedItem.dataDeSaidaOriginal || ""}
+                onChange={(e) => {
+                  const valor = e.target.value;
+                  const [dia, mes, ano] = valor.split("/");
+
+                  let dataISO = "";
+                  if (
+                    dia &&
+                    mes &&
+                    ano &&
+                    dia.length === 2 &&
+                    mes.length === 2 &&
+                    ano.length === 4
+                  ) {
+                    dataISO = `${ano}-${mes}-${dia}`;
+                  }
+
                   setSelectedItem({
                     ...selectedItem,
-                    dataDeSaida: e.target.value,
-                  })
-                }
+                    dataDeSaidaOriginal: valor, // dd/mm/yyyy (para visualização)
+                    dataDeSaida: dataISO, // yyyy-mm-dd (para envio)
+                  });
+                }}
               >
                 {(inputProps) => (
                   <TextField
@@ -411,6 +427,7 @@ export default function BasicCard() {
                   />
                 )}
               </InputMask>
+
               <FormControl fullWidth margin="normal">
                 <InputLabel>Tipo</InputLabel>
                 <Select
