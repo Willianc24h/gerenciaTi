@@ -1,3 +1,4 @@
+import React from 'react'
 import { useLocation, useNavigate } from "react-router-dom";
 import Style from "./Header.module.css";
 
@@ -12,8 +13,7 @@ function Header() {
 
   // Definir os links de navegação com base na página atual
   const navMap = {
-    "/computadores": ["tarefas"],
-    "/tarefas": ["computadores"],
+    "/computadores": [""],
   };
 
   const links = navMap[currentPath] || [];

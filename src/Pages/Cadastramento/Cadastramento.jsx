@@ -1,21 +1,17 @@
-import CardCadastro from '../../Components/CardCadastro/CardCadastro'
-import Pesquisa from '../../Components/Pesquisa/Pesquisa';
-function Cadastramento() {
+import React from 'react'
+import PesquisaComLupa from '../../Components/Pesquisa/Pesquisa';
+import BasicCard from '../../Components/CardCadastro/CardCadastro';
 
-
-
- 
+const Cadastramento = () => {
   return (
     <div>
-      <Pesquisa/>
-      
-<br />
-<br />
-      <main>
-        <CardCadastro/>
-      </main>
+      <br />
+      <PesquisaComLupa />
+      <br />
+      <br /><br /><br />
+      <BasicCard />
     </div>
-  )
-}
+  );
+};
 
-export default Cadastramento
+export default Cadastramento;
