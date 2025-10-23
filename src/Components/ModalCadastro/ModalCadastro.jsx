@@ -178,7 +178,7 @@ function ModalCadastro({ open, onClose, fetchDados }) {
     e.preventDefault();
     setIsLoading(true);
 
-    const url = "http://192.168.5.32:5108/api/cadastro/";
+    const url = "http://localhost:5108/api/cadastro/";
 
     const dataDeEntradaFormatada = convertToAPIFormat(formData.dataDeEntrada);
     const dataDeSaidaFormatada = convertToAPIFormat(formData.dataDeSaida);
