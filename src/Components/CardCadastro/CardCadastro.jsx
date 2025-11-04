@@ -42,6 +42,7 @@ export default function BasicCard() {
     "DaVita",
     "Financeiro",
     "Operacoes",
+    "Newe Seguros",
     "Planejamento",
     "Qualidade",
     "RH",
@@ -128,7 +129,7 @@ export default function BasicCard() {
 
     const updatedItem = { ...selectedItem };
 
-    const url = `http://192.168.5.32:5108/api/cadastro/${updatedItem.tag}`;
+    const url = `http://localhost:5108/api/cadastro/${updatedItem.tag}`;
     try {
       const response = await fetch(url, {
         method: "PUT",

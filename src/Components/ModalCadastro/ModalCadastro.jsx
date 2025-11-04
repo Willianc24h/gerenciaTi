@@ -10,7 +10,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { IMaskInput } from "react-imask";
 
 const setores = [
@@ -21,6 +21,7 @@ const setores = [
   "Droom",
   "Financeiro",
   "Operações",
+  "Newe Seguros",
   "Planejamento",
   "Qualidade",
   "RH",
