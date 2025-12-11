@@ -44,9 +44,6 @@ function Login() {
   const handleMouseUpPassword = (event) => {
     event.preventDefault();
   };
-
-  console.log("Enviando:", { email, senha: password });
-
   return (
     <div className={S.tudo}>
     <img src={image} alt="" className={S.image}/>

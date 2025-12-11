@@ -37,7 +37,7 @@ const CadastroUsuario = () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:5108/api/auth/register', novoUsuario);
+      const response = await axios.post('http://192.168.5.32:5108/api/auth/register', novoUsuario);
       console.log('Usuário cadastrado com sucesso:', response.data);
 
       // Limpa os campos
