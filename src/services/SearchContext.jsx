@@ -12,7 +12,7 @@ export const SearchProvider = ({ children }) => {
   const fetchInitialData = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5108/api/cadastro/");
+      const response = await fetch("http://192.168.5.32:5108/api/cadastro/");
       const data = await response.json();
       setAllData(data.dados);
       // Exibir apenas os que estão com ativo: true na tela inicial
