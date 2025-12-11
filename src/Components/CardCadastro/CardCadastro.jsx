@@ -90,7 +90,7 @@ export default function BasicCard() {
 
     try {
       const response = await fetch(
-        `http://localhost:5108/api/cadastro/inativa/${selectedItem.tag}`,
+        `http://192.168.5.32:5108/api/cadastro/inativa/${selectedItem.tag}`,
         {
           method: "PUT",
         }
@@ -129,7 +129,7 @@ export default function BasicCard() {
 
     const updatedItem = { ...selectedItem };
 
-    const url = `http://localhost:5108/api/cadastro/${updatedItem.tag}`;
+    const url = `http://192.168.5.32:5108/api/cadastro/${updatedItem.tag}`;
     try {
       const response = await fetch(url, {
         method: "PUT",
