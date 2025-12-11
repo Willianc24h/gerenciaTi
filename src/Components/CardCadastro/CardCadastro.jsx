@@ -32,7 +32,7 @@ export default function BasicCard() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [activeCount, setActiveCount] = useState(0);
   const [inactiveCount, setInactiveCount] = useState(0);
-  const [itemsToShow, setItemsToShow] = useState(10);
+  const [itemsToShow, setItemsToShow] = useState(12);
   const [openCadastro, setOpenCadastro] = useState(false);
 
   const setores = [
@@ -90,7 +90,7 @@ export default function BasicCard() {
 
     try {
       const response = await fetch(
-        `http://192.168.5.32:5108/api/cadastro/inativa/${selectedItem.tag}`,
+        `http://localhost:5108/api/cadastro/inativa/${selectedItem.tag}`,
         {
           method: "PUT",
         }
@@ -129,7 +129,7 @@ export default function BasicCard() {
 
     const updatedItem = { ...selectedItem };
 
-    const url = `http://192.168.5.32:5108:5108/api/cadastro/${updatedItem.tag}`;
+    const url = `http://localhost:5108/api/cadastro/${updatedItem.tag}`;
     try {
       const response = await fetch(url, {
         method: "PUT",
@@ -147,7 +147,7 @@ export default function BasicCard() {
   };
 
   const handleLoadMore = () => {
-    setItemsToShow((prev) => prev + 10); // Incrementa 10 itens a cada clique
+    setItemsToShow((prev) => prev + 12);
   };
 
   return (
