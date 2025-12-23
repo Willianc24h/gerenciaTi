@@ -31,6 +31,7 @@ const setores = [
   "Droom",
   "Financeiro",
   "Operações",
+  "Newe Seguros",
   "Planejamento",
   "Qualidade",
   "RH",

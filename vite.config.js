@@ -6,5 +6,6 @@ export default defineConfig({
   server: {
     host: true, // equivale a 0.0.0.0
     port: 5173,
+    strictPort: true, // erro se a porta estiver ocupad
   },
 });

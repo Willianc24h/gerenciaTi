@@ -42,6 +42,7 @@ export default function BasicCard() {
     "DaVita",
     "Financeiro",
     "Operacoes",
+    "Newe Seguros",
     "Planejamento",
     "Qualidade",
     "RH",

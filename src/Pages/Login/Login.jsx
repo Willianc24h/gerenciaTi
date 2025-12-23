@@ -21,7 +21,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5108/api/login", {
+      const response = await axios.post("http://192.168.5.32:5108/api/login", {
         email,
         password,
       });
@@ -44,9 +44,6 @@ function Login() {
   const handleMouseUpPassword = (event) => {
     event.preventDefault();
   };
-
-  console.log("Enviando:", { email, senha: password });
-
   return (
     <div className={S.tudo}>
     <img src={image} alt="" className={S.image}/>
